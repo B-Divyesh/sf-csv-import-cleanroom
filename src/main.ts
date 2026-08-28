@@ -155,6 +155,13 @@ function bindEvents(): void {
     history.pushState({ section: 'how' }, '', '#how');
     document.querySelector<HTMLElement>('#how-title')?.focus();
   });
+  app.querySelectorAll<HTMLAnchorElement>('a[href="/demo/"], a[href="/privacy/"], a[href="/terms/"]').forEach(link => link.addEventListener('click', event => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return;
+    event.preventDefault();
+    const destination = link.getAttribute('href')!;
+    history.pushState({ route: destination }, '', destination);
+    location.replace(destination);
+  }));
   app.querySelectorAll<HTMLInputElement>('[data-file]').forEach(input => input.addEventListener('change', () => void loadFile(input)));
   app.querySelectorAll<HTMLElement>('[data-action]').forEach(element => element.addEventListener('click', () => void action(element.dataset.action ?? '')));
   app.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-map]').forEach(input => input.addEventListener('change', () => updateMapping(input)));
