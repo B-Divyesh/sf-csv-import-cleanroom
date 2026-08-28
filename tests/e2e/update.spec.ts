@@ -36,10 +36,10 @@ test('activates a waiting service-worker update from the in-app notice', async (
       const registration = await navigator.serviceWorker.getRegistration();
       return navigator.serviceWorker.controller?.scriptURL.includes(version) && registration?.active?.scriptURL.includes(version) && (await caches.keys()).some(key => key.includes(version));
     }, updateVersion);
-    // The controller-change handler deliberately reloads immediately. Reload once
-    // more only after the replacement controller and its shell cache are proven,
-    // so this test also verifies a cold shell under the new worker.
-    await page.reload({ waitUntil: 'domcontentloaded' });
+    // The controller-change handler deliberately reloads the shell. Waiting for
+    // its replacement controller and then asserting this rendered document
+    // verifies that cold post-update shell without issuing a competing reload.
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Prepare CSV imports.');
   } finally {
     await writeFile(workerPath, await readFile(join(fixture, 'sw.original.js'), 'utf8'));
