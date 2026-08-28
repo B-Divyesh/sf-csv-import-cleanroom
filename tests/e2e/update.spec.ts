@@ -12,14 +12,14 @@ test('activates a waiting service-worker update from the in-app notice', async (
   await page.goto('/');
   await page.waitForFunction(async () => {
     const registration = await navigator.serviceWorker.ready;
-    return registration.active?.state === 'activated' && navigator.serviceWorker.controller?.state === 'activated';
+    return registration.active?.state === 'activated' && navigator.serviceWorker.controller?.state === 'activated' && document.documentElement.dataset.serviceWorkerUpdates === 'ready';
   });
   // Reload once under the installed controller. The application now knows this
   // is an update (not a first install), so controllerchange owns the one reload.
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForFunction(async () => {
     const registration = await navigator.serviceWorker.ready;
-    return registration.active?.state === 'activated' && navigator.serviceWorker.controller?.state === 'activated';
+    return registration.active?.state === 'activated' && navigator.serviceWorker.controller?.state === 'activated' && document.documentElement.dataset.serviceWorkerUpdates === 'ready';
   });
 
   try {

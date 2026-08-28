@@ -345,6 +345,7 @@ function registerServiceWorker(): void {
   navigator.serviceWorker.register('/sw.js').then(registration => {
     if (registration.waiting) showUpdate(registration);
     registration.addEventListener('updatefound', () => registration.installing?.addEventListener('statechange', () => { if (registration.waiting && navigator.serviceWorker.controller) showUpdate(registration); }));
+    document.documentElement.dataset.serviceWorkerUpdates = 'ready';
   }).catch(() => { /* The app remains usable without installation. */ });
   let refreshing = false; navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController && !refreshing) { refreshing = true; location.reload(); } });
 }

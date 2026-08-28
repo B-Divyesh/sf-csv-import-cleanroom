@@ -392,10 +392,14 @@ test('has no serious or critical accessibility violations in every workflow stat
 test('keyboard operates the demo action and trapped license dialog with visible focus', async ({ page }) => {
   await page.goto('/');
   const sample = page.getByRole('button', { name: 'Try it with sample data' });
-  await sample.focus();
+  await expect(page.locator('#page-title')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(sample).toBeFocused();
   await expect(sample).toHaveCSS('outline-width', '3px');
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL('http://127.0.0.1:4173/?demo=1');
+  await expect(page.getByText('customer-source-sample.csv')).toBeVisible();
+  await expect(page.locator('#workspace-title')).toBeFocused();
   const licenseButton = page.getByRole('button', { name: 'View Cleanroom Plus — $19 once' }).first();
   await licenseButton.focus();
   await page.keyboard.press('Enter');
