@@ -1,7 +1,8 @@
-const VERSION = 'cleanroom-v1.0.0';
+const VERSION = 'cleanroom-v1.0.2';
 const SHELL = `${VERSION}-shell`;
 const ASSETS = `${VERSION}-assets`;
-const PRECACHE = ['/', '/index.html', '/manifest.webmanifest', '/offline.html', '/privacy/', '/terms/', '/assets/icon.svg', '/assets/icon-192.png', '/assets/icon-512.png', '/assets/calibration-bench-mobile.webp', '/assets/calibration-bench.webp'];
+const BUILD_ASSETS = [];
+const PRECACHE = [...new Set(['/', '/index.html', '/manifest.webmanifest', '/offline.html', '/privacy/', '/terms/', '/assets/icon.svg', '/assets/icon-192.png', '/assets/icon-512.png', '/assets/calibration-bench-mobile.webp', '/assets/calibration-bench.webp', ...BUILD_ASSETS])];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(SHELL).then(cache => cache.addAll(PRECACHE)));
