@@ -1,6 +1,6 @@
 # Polish round 2 — full review closure
 
-Repair commit: pending at time of this record. Evidence is captured by the named Playwright or Vitest test; live evidence is recorded in the handoff after deployment.
+Repair commit: `3f07771462fac63bd95454daf00980790b8df266`. Evidence is captured by the named Playwright or Vitest test; live evidence is recorded in the handoff after deployment.
 
 | Finding | Change made | Evidence |
 | --- | --- | --- |
