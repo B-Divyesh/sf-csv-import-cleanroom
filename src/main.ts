@@ -82,7 +82,7 @@ function render(): void {
       <section class="privacy-facts" aria-labelledby="privacy-title"><div><p class="eyebrow">Privacy and limits</p><h2 id="privacy-title">Process CSV files on this device</h2></div><div><p>Spreadsheet rows stay in your browser during normal and demo processing.</p><p>Review the exported CSV before importing it into your target service.</p><a href="/privacy/">Read the privacy policy</a></div></section>
       <section class="plus-section" aria-labelledby="plus-title"><div><p class="eyebrow">Cleanroom Plus</p><h2 id="plus-title">Save unlimited recipes for $19 once</h2><p>No subscription. CSV export, recipe export, rejection reports, and safety checks stay free.</p></div><div class="tier-list"><p><strong>Free</strong><br>Save one recipe and export every result.</p><p><strong>Plus · $19 once</strong><br>Unlimited saved recipes on this device.</p><button class="primary" data-action="license">View Cleanroom Plus — $19 once</button></div></section>`}
     </main>
-    <footer><div><strong>CSV Import Cleanroom</strong><p>Local CSV preparation for strict imports.</p></div><nav aria-label="Legal"><a href="/demo/">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><button class="text-button" data-action="license">${state.paid ? 'License active' : 'View Cleanroom Plus — $19 once'}</button></nav><p class="provenance">Built by Param Factory · v1.0.8 · Hero artwork generated for this product with factory-image.</p></footer>
+    <footer><div><strong>CSV Import Cleanroom</strong><p>Local CSV preparation for strict imports.</p></div><nav aria-label="Legal"><a href="/demo/">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><button class="text-button" data-action="license">${state.paid ? 'License active' : 'View Cleanroom Plus — $19 once'}</button></nav><p class="provenance">Built by Param Factory · v1.0.9 · Hero artwork generated for this product with factory-image.</p></footer>
     ${state.showLicense ? licensePanel() : ''}
     <div id="toast" class="toast" hidden role="status"><span>An app update is ready.</span><button data-action="update">Update now</button></div>`;
   bindEvents();
@@ -199,7 +199,7 @@ async function loadFile(input: HTMLInputElement): Promise<void> {
 async function action(name: string): Promise<void> {
   if (name === 'sample') {
     if (state.demo) loadSample();
-    else location.assign('/demo/');
+    else location.assign('/?demo=1');
   }
   else if (name === 'continue') { state.stage = 2; render(); focusStage(); }
   else if (name === 'run') inspect();

@@ -9,7 +9,7 @@
   {
     "id": "csv-export",
     "claim": "The free workflow exports accepted sample rows as CSV and a reusable recipe as JSON.",
-    "where": "Export rack, license panel, README, Terms",
+    "where": "Inspection exports, license panel, README, Terms",
     "test": "npm run test:e2e -- --grep @claim:csv-export",
     "sandbox": "Without a license, run the shipped demo and inspect both downloaded files; assert no license gate opens."
   },

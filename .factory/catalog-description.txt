@@ -1,1 +1,1 @@
-Prepare strict CSV imports locally, validate every row, explain rejects, and reuse mappings.
+Prepare strict CSV imports locally, validate each row, explain rejects, and reuse mapping recipes.

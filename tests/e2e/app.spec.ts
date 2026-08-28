@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 
 const LICENSE_KEY = 'sb_license:csv-import-cleanroom';
 const VERDICT_KEY = 'sb_license_verdict:csv-import-cleanroom';
@@ -26,7 +26,7 @@ test('@claim:demo-isolation keeps sample work separate and preserves a real draf
   await page.locator('#target-file').setInputFiles({ name: 'real-template.csv', mimeType: 'text/csv', buffer: Buffer.from('external_id\n') });
   await expect(page.getByText('real-ops.csv', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Try it with sample data' }).click();
-  await expect(page).toHaveURL(/\/demo\//);
+  await expect(page).toHaveURL('http://127.0.0.1:4173/?demo=1');
   await expect(page.getByText('Demo — sample data, nothing is saved')).toBeVisible();
   await expect(page.getByText('customer-source-sample.csv')).toBeVisible();
   await page.reload();
@@ -390,7 +390,7 @@ test('keyboard operates the demo action and trapped license dialog with visible 
   await sample.focus();
   await expect(sample).toHaveCSS('outline-width', '3px');
   await page.keyboard.press('Enter');
-  await expect(page).toHaveURL(/\/demo\//);
+  await expect(page).toHaveURL('http://127.0.0.1:4173/?demo=1');
   const licenseButton = page.getByRole('button', { name: 'View Cleanroom Plus — $19 once' }).first();
   await licenseButton.focus();
   await page.keyboard.press('Enter');
@@ -422,13 +422,10 @@ test('file controls expose visible focus, checkbox targets are 44px, and malform
   await expect(page.getByRole('alert')).toContainText('Export a recipe from Cleanroom');
 });
 
-test('serves product routes, metadata, sitemap, a real 404, and a versioned PWA', async ({ page }) => {
+test('serves product routes, metadata, a real 404, and a versioned PWA', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://csv-import-cleanroom.sociobot.in/');
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /social-card\.webp$/);
-  const sitemap = await page.request.get('/sitemap.xml');
-  expect(sitemap.ok()).toBe(true);
-  expect(await sitemap.text()).toContain('/demo/');
   const config = JSON.parse(await readFile('staticwebapp.config.json', 'utf8'));
   expect(config.mimeTypes['.webmanifest']).toBe('application/manifest+json');
   expect(config.responseOverrides['404']).toEqual({ rewrite: '/404.html', statusCode: 404 });
@@ -448,6 +445,36 @@ test('serves product routes, metadata, sitemap, a real 404, and a versioned PWA'
   expect(builtWorker).not.toContain('__BUILD_VERSION__');
   const manifestJson = await manifest.json();
   expect(manifestJson).toMatchObject({ start_url: '/', description: 'Prepare strict CSV imports locally with reusable mappings and validation.' });
+});
+
+test('route inventory keeps the sitemap aligned with every indexable shipped page', async ({ page }) => {
+  const htmlFiles = (await readdir('dist', { recursive: true }))
+    .filter(file => file.endsWith('.html'))
+    .sort();
+  expect(htmlFiles).toEqual([
+    '404.html',
+    'demo/index.html',
+    'index.html',
+    'offline.html',
+    'privacy/index.html',
+    'terms/index.html'
+  ]);
+
+  const shipped = await Promise.all(htmlFiles.map(async file => {
+    const html = await readFile(`dist/${file}`, 'utf8');
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
+    expect(canonical, `${file} canonical`).toBeTruthy();
+    return { canonical: canonical!, noindex: /<meta name="robots" content="[^"]*noindex/.test(html) };
+  }));
+  const indexable = shipped.filter(route => !route.noindex).map(route => route.canonical).sort();
+  const excluded = shipped.filter(route => route.noindex).map(route => route.canonical).sort();
+
+  const sitemapResponse = await page.request.get('/sitemap.xml');
+  expect(sitemapResponse.ok()).toBe(true);
+  const sitemapUrls = [...(await sitemapResponse.text()).matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]).sort();
+  expect(sitemapUrls).toEqual(indexable);
+  expect(excluded).toEqual(['https://csv-import-cleanroom.sociobot.in/404.html']);
+  expect(sitemapUrls).toContain('https://csv-import-cleanroom.sociobot.in/offline.html');
 });
 
 test('ships a CSP-compatible offline fallback with route metadata and no console errors', async ({ page }) => {
