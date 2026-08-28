@@ -1,0 +1,50 @@
+{
+  "routes": {
+    "/": {
+      "title": "CSV Import Cleanroom — Prepare CSV imports",
+      "errors": [],
+      "axeViolations": 0
+    },
+    "/demo/": {
+      "title": "Demo — CSV Import Cleanroom",
+      "errors": [],
+      "axeViolations": 0
+    },
+    "/privacy/": {
+      "title": "Privacy — CSV Import Cleanroom",
+      "errors": [],
+      "axeViolations": 0
+    },
+    "/terms/": {
+      "title": "Terms — CSV Import Cleanroom",
+      "errors": [],
+      "axeViolations": 0
+    },
+    "/404.html": {
+      "title": "Page not found — CSV Import Cleanroom",
+      "errors": [],
+      "axeViolations": 0
+    },
+    "/offline.html": {
+      "title": "Offline — CSV Import Cleanroom",
+      "errors": [],
+      "axeViolations": 0
+    }
+  },
+  "mobile": {
+    "banner": true,
+    "reset": true,
+    "startReal": true,
+    "mappingTop": 484.828125,
+    "title": "Demo — CSV Import Cleanroom"
+  },
+  "offline": {
+    "banner": true,
+    "sample": true
+  },
+  "focus": {
+    "activeId": "workspace-title",
+    "title": "CSV Import Cleanroom — Prepare CSV imports"
+  },
+  "workerVersion": true
+}

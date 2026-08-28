@@ -1,21 +1,60 @@
-# CSV Import Cleanroom — adversarial review 3 handoff
+# CSV Import Cleanroom — polish round 3 handoff
 
 ## Result
 
-Review 3 is complete with verdict **FAIL**. The report records six blocking and ten minor findings at `.factory/review-3.md`. Product code was not modified.
+All findings in `review-1.md`, `review-2.md`, and `review-3.md` are resolved. The repaired product was deployed through the static work-order deployment to <https://csv-import-cleanroom.sociobot.in>.
 
-The blocking items are a dead `/demo/#how` link, four partially fixed earlier findings (workspace focus, metadata claim, mapping terminology, and claim-registry completeness), and a CSP-broken/structurally incomplete offline page. The report also records unlisted Privacy/Terms claims and remaining metaphorical or result-mismatched interface copy.
+Product repair commits:
 
-## Verification performed
+- `06e57c4 fix: close polish review findings`
+- `2e803d5 test: stabilize service worker update lifecycle`
 
-- Opened production cold in fresh Chromium contexts at 390 × 844 and 1440 × 900 before scrolling.
-- Exercised the live one-click demo, sample mapping, Reset demo, Start for real, isolated IndexedDB namespaces, and outgoing-request log.
-- Ran every command in `.factory/claims.json` individually from clean clone `/tmp/csv-cleanroom-review3-ZO2LWZ`; all 12 passed.
-- Ran `npm test` (9/9), `npm run lint`, `npm run build`, and `npm run test:e2e` (30/30).
-- Ran `npm run test:e2e -- tests/e2e/update.spec.ts --repeat-each=5` (5/5).
-- Crawled live links and fragment targets, checked route metadata/HTTP status, tested Home → Demo/Privacy → Back, and scanned Home, Demo, Privacy, Terms, and 404 with Axe; the main routes had zero Axe violations.
-- Opened `/offline.html` directly and confirmed its CSP style violation and missing route skeleton.
+Deployment: `e9d59d32-d0ea-4710-a0b7-fed26eab7365` (Static Web Apps, Central US). The deployed product build is `2e803d5`; this handoff and the evidence records are documentation-only follow-up work.
 
-## Next steps
+## Delivered
 
-Resolve every finding in `.factory/review-3.md`, preserving the working demo isolation and deterministic local workflow. Add claim entries and tagged tests before retaining the unlisted promises. Re-run the review from scratch after deployment; do not accept the prior polish status as closure for F-1-3, F-1-8, F-1-15, or F-1-26.
+- A direct `?demo=1` sandbox with separately namespaced demo storage, a persistent banner, Reset demo, and Start for real controls. The mapped sample is visible in the first mobile viewport.
+- Correct in-page destination focus, direct and back/forward route behavior, route announcements, and a working Demo → How it works link.
+- Complete route metadata and common navigation/footer skeletons, including a CSP-compatible offline fallback and a real 404.
+- All retained visitor promises recorded in `.factory/claims.json`, including local data deletion, tracking/resource privacy, and license revocation.
+- Plain-language copy fixes, consistent mapping terminology, version-derived PWA cache naming, and a one-line verb-first catalog description.
+
+## Verification
+
+From a fresh `npm ci` clone at `2e803d59c1846585520405093007d57a4c6de3e3`:
+
+```text
+every command listed in .factory/claims.json       PASS (15/15 claim tests)
+npm test                                           PASS (9/9)
+npm run lint                                       PASS
+npm run build                                      PASS (dist/ produced)
+npm run test:e2e                                   PASS (37/37)
+npm run test:e2e -- tests/e2e/update.spec.ts --repeat-each=8
+                                                   PASS (8/8)
+git diff --check                                   PASS
+```
+
+The production build has 12.03 kB gzip JavaScript and 5.11 kB gzip CSS. The post-build service worker cache is `cleanroom-v1.0.8`.
+
+Cold live verification covered `/`, `/demo/`, `/privacy/`, `/terms/`, `/404.html`, and `/offline.html`:
+
+- `verify-url.sh` reports a correct title, `lang=en`, one H1, a main landmark, no missing image alt text, no unnamed buttons, and no console errors for each route. Evidence: `.factory/qa-evidence/polish-3-live-*/verify.json`.
+- Playwright Axe scans found **0 violations at every impact level** on all six routes. The same cold check confirmed the 390 px demo banner/reset/exit controls, direct `?demo=1`, workspace-heading focus, offline demo reload, the repaired Demo fragment, and the `1.0.8` worker. Evidence: `.factory/qa-evidence/polish-3-live-check.json`.
+- A cold missing URL returned HTTP 404 with the designed error page. Evidence: `.factory/qa-evidence/polish-3-live-404.html`.
+- Live Lighthouse scored Performance 100, Accessibility 100, Best Practices 100, and SEO 100; LCP was 1.2 s and CLS was 0. Evidence: `.factory/qa-evidence/polish-3-lighthouse-live.json`.
+
+## Run locally
+
+```bash
+npm ci
+npm test
+npm run lint
+npm run build
+npm run test:e2e
+```
+
+Run each exact `test` command in `.factory/claims.json` independently to repeat the claim audit. `npm run dev` starts the local app. The demo contract, sample data, reset behavior, and storage namespaces are documented in `.factory/demo.md`.
+
+## Known gaps
+
+None.
