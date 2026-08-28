@@ -1,8 +1,10 @@
-# CSV Import Cleanroom — polish round 3 handoff
+# CSV Import Cleanroom — review 4 handoff
 
 ## Result
 
-All findings in `review-1.md`, `review-2.md`, and `review-3.md` are resolved. The repaired product was deployed through the static work-order deployment to <https://csv-import-cleanroom.sociobot.in>.
+Review 4 made no product-code changes. It rechecked the live deployment and the
+repository from a fresh clone. Earlier findings are resolved, but review 4 found
+one remaining minor route-inventory issue; see `.factory/review-4.md` F-4-1.
 
 Product repair commits:
 
@@ -57,4 +59,6 @@ Run each exact `test` command in `.factory/claims.json` independently to repeat 
 
 ## Known gaps
 
-None.
+- `public/sitemap.xml` omits `/offline.html` and `/404.html`; review 4 records
+  this as F-4-1. Establish and test the intended sitemap/noindex policy, then
+  repeat the route crawl.
