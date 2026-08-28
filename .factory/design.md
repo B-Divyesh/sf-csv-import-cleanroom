@@ -6,7 +6,7 @@ CSV Import Cleanroom is styled as a **mid-century instrument panel**: a warm ena
 
 ## Tokens
 
-- Background `#e9e1cf` (aged drafting paper); surface `#f8f2e5`; raised surface `#fffaf0`; ink `#1d2927`; muted ink `#59645f`.
+- Background `#e9e1cf` (aged drafting paper); surface `#f8f2e5`; raised surface `#fffaf0`; ink `#1d2927`; muted ink `#46514c`.
 - Panel `#213532` and panel ink `#f8f1df`; accent `#c64d32` (signal red); accent dark `#8f2f20`; brass `#b98a3d`.
 - Success `#216a50`; warning `#8b5c08`; danger `#9f3027`; hairline `#aa9f88`. Status always includes a word or icon, never color alone.
 - Type: system sans (`Inter`-like UI stack, no download) for prose and labels; `ui-monospace` for column names, counts, and samples. This keeps first load small and makes field-level work scan quickly.

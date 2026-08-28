@@ -25,6 +25,11 @@ describe('transforms and validation', () => {
     expect(result.lossyCount).toBeGreaterThan(0);
   });
 
+  it('rejects calendar-invalid ISO dates', () => {
+    const mappings: FieldMapping[] = [{ target: 'date', source: 'Date', transform: 'copy', validation: 'iso-date', required: true, defaultValue: '' }];
+    expect(runRecipe(['Date'], [['2026-02-31']], mappings).rejected[0]?.errors[0]).toContain('is not an ISO date');
+  });
+
   it('detects formula-risk fields before safe export', () => {
     const mappings: FieldMapping[] = [{ target: 'external_id', source: 'ID', transform: 'copy', validation: 'none', required: false, defaultValue: '' }];
     expect(runRecipe(['ID'], [['=2+2']], mappings).formulaCount).toBe(1);
@@ -33,7 +38,7 @@ describe('transforms and validation', () => {
 
 describe('recipe validation', () => {
   it('accepts only a complete versioned Cleanroom recipe', () => {
-    const recipe = { kind: 'csv-import-cleanroom-recipe', version: 1, id: '1', name: 'x', createdAt: '', updatedAt: '', targetHeaders: ['name'], mappings: [{ target: 'name' }] };
+    const recipe = { kind: 'csv-import-cleanroom-recipe', version: 1, id: '1', name: 'x', createdAt: '', updatedAt: '', targetHeaders: ['name'], mappings: [{ target: 'name', source: 'Name', transform: 'trim', validation: 'required', required: true, defaultValue: '' }] };
     expect(validateRecipe(recipe).name).toBe('x');
     expect(() => validateRecipe({ ...recipe, version: 2 })).toThrow(/not a Cleanroom v1/);
     expect(() => validateRecipe({ ...recipe, targetHeaders: ['other'] })).toThrow(/incomplete/);

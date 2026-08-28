@@ -65,7 +65,10 @@ function validDate(year: number, month: number, day: number): string | null {
 function validationError(value: string, rule: ValidationId, required: boolean): string | null {
   if (value === '') return required || rule === 'required' ? 'is required but empty' : null;
   if (rule === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'is not a valid email address';
-  if (rule === 'iso-date' && !/^\d{4}-\d{2}-\d{2}$/.test(value)) return 'is not an ISO date (YYYY-MM-DD)';
+  if (rule === 'iso-date') {
+    const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    if (!parts || validDate(Number(parts[1]), Number(parts[2]), Number(parts[3])) !== value) return 'is not an ISO date (YYYY-MM-DD)';
+  }
   if (rule === 'number' && !Number.isFinite(Number(value))) return 'is not a number';
   if (rule === 'whole-number' && !/^-?\d+$/.test(value)) return 'is not a whole number';
   return null;
@@ -108,6 +111,8 @@ export function validateRecipe(value: unknown): Recipe {
   if (!value || typeof value !== 'object') throw new Error('That JSON file does not contain a recipe.');
   const recipe = value as Partial<Recipe>;
   if (recipe.kind !== 'csv-import-cleanroom-recipe' || recipe.version !== 1 || !Array.isArray(recipe.mappings) || !Array.isArray(recipe.targetHeaders)) throw new Error('This is not a Cleanroom v1 recipe.');
-  if (recipe.mappings.length !== recipe.targetHeaders.length || recipe.mappings.some((mapping, index) => !mapping || mapping.target !== recipe.targetHeaders?.[index])) throw new Error('The recipe target columns are incomplete or out of order.');
+  const transforms = new Set(TRANSFORMS.map(item => item.id));
+  const validations = new Set(VALIDATIONS.map(item => item.id));
+  if (recipe.mappings.length !== recipe.targetHeaders.length || recipe.mappings.some((mapping, index) => !mapping || mapping.target !== recipe.targetHeaders?.[index] || typeof mapping.source !== 'string' || typeof mapping.defaultValue !== 'string' || typeof mapping.required !== 'boolean' || !transforms.has(mapping.transform) || !validations.has(mapping.validation))) throw new Error('The recipe target columns or rules are incomplete or invalid.');
   return recipe as Recipe;
 }

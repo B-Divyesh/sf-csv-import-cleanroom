@@ -149,7 +149,7 @@ function bindEvents(): void {
   app.querySelectorAll<HTMLElement>('[data-delete-recipe]').forEach(button => button.addEventListener('click', () => void removeRecipe(button.dataset.deleteRecipe!)));
   const dialog = app.querySelector<HTMLElement>('[role="dialog"]');
   dialog?.addEventListener('keydown', event => {
-    if (event.key === 'Escape') { state.showLicense = false; render(); return; }
+    if (event.key === 'Escape') { closeLicense(); return; }
     if (event.key !== 'Tab') return;
     const focusable = [...dialog.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),input:not([disabled])')];
     const first = focusable[0], last = focusable.at(-1);
@@ -180,7 +180,7 @@ async function action(name: string): Promise<void> {
   else if (name === 'import-recipe') app.querySelector<HTMLInputElement>('#recipe-file')?.click();
   else if (name === 'save-recipe') await saveCurrentRecipe();
   else if (name === 'license') { state.showLicense = true; render(); queueMicrotask(() => app.querySelector<HTMLButtonElement>('.modal-close')?.focus()); }
-  else if (name === 'close-license') { state.showLicense = false; render(); }
+  else if (name === 'close-license') closeLicense();
   else if (name === 'restore-license') await restoreLicense();
   else if (name === 'update') location.reload();
 }
@@ -203,8 +203,10 @@ function updateMapping(input: HTMLInputElement | HTMLSelectElement): void {
   const key = input.dataset.map as keyof FieldMapping;
   if (key === 'required' && input instanceof HTMLInputElement) mapping.required = input.checked;
   else (mapping as unknown as Record<string, string>)[key] = input.value;
-  state.result = null; void persist(); render();
+  state.result = null; void persist();
 }
+
+function closeLicense(): void { state.showLicense = false; render(); queueMicrotask(() => app.querySelector<HTMLElement>('[data-action="license"]')?.focus()); }
 
 function inspect(): void {
   if (!state.source || !state.target) return;

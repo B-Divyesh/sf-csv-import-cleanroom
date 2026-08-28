@@ -16,6 +16,7 @@ describe('CSV parser', () => {
 
   it('neutralizes spreadsheet formulas on CSV export', () => {
     for (const value of ['=1+1', '+cmd', '-10+20', '@SUM(A1)', '  =hidden']) expect(safeCell(value)).toBe(`'${value}`);
+    expect(safeCell('-1240.50')).toBe('-1240.50');
     expect(serializeCsv(['value'], [['=1+1'], ['plain']])).toBe("value\r\n'=1+1\r\nplain");
   });
 });

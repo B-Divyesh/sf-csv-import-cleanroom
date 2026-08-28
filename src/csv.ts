@@ -63,7 +63,7 @@ export function guardFile(file: File): void {
 }
 
 export function safeCell(value: string): string {
-  return /^[\t\r\n ]*[=+\-@]/.test(value) ? `'${value}` : value;
+  return isFormulaRisk(value) ? `'${value}` : value;
 }
 
 function quoteCell(value: string): string {
@@ -76,5 +76,7 @@ export function serializeCsv(headers: string[], rows: string[][]): string {
 }
 
 export function isFormulaRisk(value: string): boolean {
-  return /^[\t\r\n ]*[=+\-@]/.test(value);
+  const trimmed = value.trimStart();
+  if (/^-\d+(?:\.\d+)?$/.test(trimmed)) return false;
+  return /^[=+@]/.test(trimmed) || /^-/.test(trimmed);
 }
