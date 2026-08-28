@@ -1,8 +1,8 @@
 {
   "name": "CSV Import Cleanroom",
   "short_name": "Cleanroom",
-  "description": "A local, repeatable preflight for strict CSV imports.",
-  "start_url": "/?v=1.0.5",
+  "description": "Prepare strict CSV imports locally with reusable mappings and validation.",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#e9e1cf",

@@ -16,6 +16,7 @@ Live product: <https://csv-import-cleanroom.sociobot.in>
 - Local limits of 10 MB and 50,000 data rows per file
 - Recipe JSON contains field names and rules, not spreadsheet rows
 - A $19 one-time Plus license with no subscription for unlimited on-device saved recipes
+- Normal work survives refresh until you reset it or delete a saved recipe
 
 Every product promise and its test appears in [`.factory/claims.json`](.factory/claims.json). The demo sandbox is documented in [`.factory/demo.md`](.factory/demo.md).
 

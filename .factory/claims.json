@@ -82,5 +82,26 @@
     "where": "Cleanroom Plus section, saved recipes, Terms",
     "test": "npm run test:e2e -- --grep @claim:free-tier-entitlements",
     "sandbox": "In a fresh demo, run inspection, download the rejection report, save one recipe, then attempt a second save and assert the Plus panel opens."
+  },
+  {
+    "id": "local-data-lifecycle",
+    "claim": "The active workspace survives refresh; Reset workspace removes it; and deleting a recipe removes that saved recipe.",
+    "where": "Privacy policy",
+    "test": "npm run test:e2e -- --grep @claim:local-data-lifecycle",
+    "sandbox": "Load normal local CSV files, reload, save and delete a recipe, reset the workspace, then inspect the normal IndexedDB records."
+  },
+  {
+    "id": "no-tracking-resources",
+    "claim": "The app has no advertising pixels, third-party analytics, tracking cookies, remote fonts, or runtime CDN scripts.",
+    "where": "Privacy policy",
+    "test": "npm run test:e2e -- --grep @claim:no-tracking-resources",
+    "sandbox": "In a fresh context, visit every product route and inspect cookies, loaded resource origins, stylesheets, and analytics or pixel DOM elements."
+  },
+  {
+    "id": "license-revocation",
+    "claim": "A refunded, revoked, expired, or wrong-product license no longer unlocks Plus.",
+    "where": "Terms",
+    "test": "npm run test:e2e -- --grep @claim:license-revocation",
+    "sandbox": "Mock each listed Sociobot verification response after an optimistic local license and assert that Plus remains locked."
   }
 ]
