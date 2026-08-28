@@ -214,7 +214,6 @@ async function action(name: string): Promise<void> {
   else if (name === 'license') { state.showLicense = true; render(); queueMicrotask(() => app.querySelector<HTMLButtonElement>('.modal-close')?.focus()); }
   else if (name === 'close-license') closeLicense();
   else if (name === 'restore-license') await restoreLicense();
-  else if (name === 'update') location.reload();
   else if (name === 'reset-demo') await resetDemo();
   else if (name === 'start-real') await startForReal();
 }
