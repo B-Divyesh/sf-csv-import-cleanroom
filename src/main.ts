@@ -344,15 +344,15 @@ function registerServiceWorker(): void {
   const hadController = Boolean(navigator.serviceWorker.controller);
   navigator.serviceWorker.register('/sw.js').then(registration => {
     offerWaitingUpdate(registration);
-    registration.addEventListener('updatefound', () => offerWaitingUpdate(registration));
+    registration.addEventListener('updatefound', () => offerWaitingUpdate(registration, true));
     document.documentElement.dataset.serviceWorkerUpdates = 'ready';
   }).catch(() => { /* The app remains usable without installation. */ });
   let refreshing = false; navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController && !refreshing) { refreshing = true; location.reload(); } });
 }
 
-function offerWaitingUpdate(registration: ServiceWorkerRegistration, attempt = 0): void {
+function offerWaitingUpdate(registration: ServiceWorkerRegistration, watchInstallation = false, attempt = 0): void {
   if (registration.waiting && navigator.serviceWorker.controller) { showUpdate(registration); return; }
-  if (registration.installing && attempt < 200) setTimeout(() => offerWaitingUpdate(registration, attempt + 1), 50);
+  if (watchInstallation && attempt < 200) setTimeout(() => offerWaitingUpdate(registration, true, attempt + 1), 50);
 }
 
 function showUpdate(registration: ServiceWorkerRegistration): void { const toast = document.querySelector<HTMLDivElement>('#toast'); if (!toast) return; toast.hidden = false; toast.querySelector('button')?.addEventListener('click', () => registration.waiting?.postMessage({ type: 'SKIP_WAITING' })); }
