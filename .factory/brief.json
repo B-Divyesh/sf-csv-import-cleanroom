@@ -1,0 +1,10 @@
+{
+  "slug": "csv-import-cleanroom",
+  "title": "CSV Import Cleanroom",
+  "territory": "utilities",
+  "user": "Operations staff and solo administrators preparing a messy spreadsheet for a strict SaaS import template who need a repeatable, auditable conversion without writing Python or damaging the original file.",
+  "smallest_useful_product": "A local CSV tool with side-by-side source/target columns, named transforms for dates/currency/IDs, validation rules, rejected-row explanations, and a reusable JSON recipe.",
+  "artifact_class": "pwa-offline",
+  "monetization": "one-time",
+  "constraints": "All parsing and transformations occur locally; protect against CSV formula injection in previews/exports; show lossy transformations before applying them; input size limits must be explicit."
+}
