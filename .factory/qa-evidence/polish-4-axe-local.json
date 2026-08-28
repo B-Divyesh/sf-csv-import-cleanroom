@@ -1,0 +1,34 @@
+{
+  "/": {
+    "violations": [],
+    "errors": []
+  },
+  "/?demo=1": {
+    "violations": [],
+    "errors": []
+  },
+  "demo-empty-inspection": {
+    "violations": [],
+    "errors": []
+  },
+  "demo-inspection": {
+    "violations": [],
+    "errors": []
+  },
+  "/privacy/": {
+    "violations": [],
+    "errors": []
+  },
+  "/terms/": {
+    "violations": [],
+    "errors": []
+  },
+  "/404.html": {
+    "violations": [],
+    "errors": []
+  },
+  "/offline.html": {
+    "violations": [],
+    "errors": []
+  }
+}

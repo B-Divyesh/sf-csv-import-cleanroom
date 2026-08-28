@@ -1,0 +1,14 @@
+{
+  "url": "https://csv-import-cleanroom.sociobot.in/offline.html",
+  "loadMs": 953,
+  "errors": [],
+  "a11y": {
+    "title": "Offline — CSV Import Cleanroom",
+    "lang": "en",
+    "h1": 1,
+    "main": true,
+    "imgsMissingAlt": 0,
+    "buttonsUnlabeled": 0,
+    "textLength": 352
+  }
+}

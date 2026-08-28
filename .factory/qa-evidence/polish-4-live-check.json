@@ -1,0 +1,165 @@
+{
+  "deployment": "479fcbee-f4f4-4cb4-910e-1ddcc869ab1e",
+  "checkedAt": "2026-08-28T23:56:01.299Z",
+  "routes": {
+    "/": {
+      "status": 200,
+      "title": "CSV Import Cleanroom — Prepare CSV imports",
+      "h1": 1,
+      "main": 1,
+      "lang": "en",
+      "canonical": "https://csv-import-cleanroom.sociobot.in/",
+      "version": true,
+      "noindex": false,
+      "axe": [],
+      "errors": []
+    },
+    "/demo/": {
+      "status": 200,
+      "title": "Demo — CSV Import Cleanroom",
+      "h1": 1,
+      "main": 1,
+      "lang": "en",
+      "canonical": "https://csv-import-cleanroom.sociobot.in/demo/",
+      "version": true,
+      "noindex": false,
+      "axe": [],
+      "errors": []
+    },
+    "/privacy/": {
+      "status": 200,
+      "title": "Privacy — CSV Import Cleanroom",
+      "h1": 1,
+      "main": 1,
+      "lang": "en",
+      "canonical": "https://csv-import-cleanroom.sociobot.in/privacy/",
+      "version": true,
+      "noindex": false,
+      "axe": [],
+      "errors": []
+    },
+    "/terms/": {
+      "status": 200,
+      "title": "Terms — CSV Import Cleanroom",
+      "h1": 1,
+      "main": 1,
+      "lang": "en",
+      "canonical": "https://csv-import-cleanroom.sociobot.in/terms/",
+      "version": true,
+      "noindex": false,
+      "axe": [],
+      "errors": []
+    },
+    "/404.html": {
+      "status": 200,
+      "title": "Page not found — CSV Import Cleanroom",
+      "h1": 1,
+      "main": 1,
+      "lang": "en",
+      "canonical": "https://csv-import-cleanroom.sociobot.in/404.html",
+      "version": true,
+      "noindex": true,
+      "axe": [],
+      "errors": []
+    },
+    "/offline.html": {
+      "status": 200,
+      "title": "Offline — CSV Import Cleanroom",
+      "h1": 1,
+      "main": 1,
+      "lang": "en",
+      "canonical": "https://csv-import-cleanroom.sociobot.in/offline.html",
+      "version": true,
+      "noindex": false,
+      "axe": [],
+      "errors": []
+    }
+  },
+  "demo": {
+    "geometry": {
+      "masthead": {
+        "top": 0,
+        "bottom": 72,
+        "left": 0,
+        "right": 390
+      },
+      "banner": {
+        "top": 108,
+        "bottom": 224,
+        "left": 0,
+        "right": 390
+      },
+      "message": {
+        "top": 116,
+        "bottom": 164,
+        "left": 16,
+        "right": 362
+      },
+      "title": {
+        "top": 291.390625,
+        "bottom": 439.828125,
+        "left": 18,
+        "right": 243.578125
+      },
+      "reset": {
+        "top": 170,
+        "bottom": 214,
+        "left": 16,
+        "right": 137.40625
+      },
+      "start": {
+        "top": 170,
+        "bottom": 214,
+        "left": 272.421875,
+        "right": 374
+      },
+      "mapping": {
+        "top": 775.828125,
+        "bottom": 1422.328125,
+        "left": 11.6875,
+        "right": 378.3125
+      },
+      "focused": "workspace-title"
+    },
+    "axe": {
+      "mapping": 0,
+      "inspection": 0
+    },
+    "offlineReload": true,
+    "worker": {
+      "script": "https://csv-import-cleanroom.sociobot.in/sw.js",
+      "versionedCache": true
+    }
+  },
+  "requests": [
+    "https://csv-import-cleanroom.sociobot.in/?cold=polish-4",
+    "https://csv-import-cleanroom.sociobot.in/assets/modulepreload-polyfill-B5Qt9EMX.js",
+    "https://csv-import-cleanroom.sociobot.in/assets/main-LgO0vBRC.js",
+    "https://csv-import-cleanroom.sociobot.in/assets/main-DrpfiZFV.css",
+    "https://csv-import-cleanroom.sociobot.in/assets/calibration-bench-mobile.webp",
+    "https://csv-import-cleanroom.sociobot.in/?demo=1",
+    "https://csv-import-cleanroom.sociobot.in/assets/modulepreload-polyfill-B5Qt9EMX.js",
+    "https://csv-import-cleanroom.sociobot.in/assets/main-LgO0vBRC.js",
+    "https://csv-import-cleanroom.sociobot.in/assets/main-DrpfiZFV.css",
+    "https://csv-import-cleanroom.sociobot.in/?demo=1",
+    "https://csv-import-cleanroom.sociobot.in/assets/modulepreload-polyfill-B5Qt9EMX.js",
+    "https://csv-import-cleanroom.sociobot.in/assets/main-LgO0vBRC.js",
+    "https://csv-import-cleanroom.sociobot.in/assets/main-DrpfiZFV.css"
+  ],
+  "errors": [],
+  "history": {
+    "url": "https://csv-import-cleanroom.sociobot.in/",
+    "title": "CSV Import Cleanroom — Prepare CSV imports",
+    "h1": "Prepare CSV imports.",
+    "focus": "page-title",
+    "announcement": "Home page loaded."
+  },
+  "sitemap": [
+    "https://csv-import-cleanroom.sociobot.in/",
+    "https://csv-import-cleanroom.sociobot.in/demo/",
+    "https://csv-import-cleanroom.sociobot.in/privacy/",
+    "https://csv-import-cleanroom.sociobot.in/terms/",
+    "https://csv-import-cleanroom.sociobot.in/offline.html"
+  ],
+  "missingStatus": 404
+}
