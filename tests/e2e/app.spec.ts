@@ -143,11 +143,11 @@ test('@claim:license-request-policy sends only the token to verification at most
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ valid: true, reason: 'ok' }) });
   });
   await page.goto('/');
-  await expect(page.getByRole('button', { name: 'Cleanroom Plus' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Cleanroom Plus', exact: true })).toBeVisible();
   await page.locator('#source-file').setInputFiles({ name: 'private.csv', mimeType: 'text/csv', buffer: Buffer.from('secret\nprivate-row\n') });
   await page.reload();
   await page.reload();
-  await expect(page.getByRole('button', { name: 'Cleanroom Plus' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Cleanroom Plus', exact: true })).toBeVisible();
   expect(checks).toBe(1);
   expect(externalRequests).toHaveLength(1);
   expect(externalRequests[0]?.url).toBe('https://api.sociobot.in/api/v1/products/csv-import-cleanroom/verify?license=daily-token');
@@ -155,12 +155,24 @@ test('@claim:license-request-policy sends only the token to verification at most
   expect(JSON.stringify(externalRequests)).not.toContain('private-row');
 });
 
+test('@claim:billing-route uses Sociobot checkout without embedded payment providers', async ({ page }) => {
+  const requests: string[] = [];
+  page.on('request', request => requests.push(request.url()));
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Unlock Plus' }).click();
+  const checkout = page.getByRole('link', { name: 'Buy Cleanroom Plus' });
+  await expect(checkout).toHaveAttribute('href', 'https://api.sociobot.in/api/v1/products/csv-import-cleanroom/checkout');
+  expect(await page.locator('iframe').count()).toBe(0);
+  expect(await page.locator('script[src*="stripe" i], script[src*="paypal" i], script[src*="dodo" i]').count()).toBe(0);
+  expect(requests.some(url => /stripe|paypal|dodo/i.test(url))).toBe(false);
+});
+
 test.describe('license verification fail-closed policy', () => {
   test('checkout-return token is stripped and unlocks only after online verification', async ({ page }) => {
     await page.route(VERIFY_URL, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ valid: true, reason: 'ok' }) }));
     await page.goto('/?license=checkout-return-token');
     await expect(page).toHaveURL('http://127.0.0.1:4173/');
-    await expect(page.getByRole('button', { name: 'Cleanroom Plus' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Cleanroom Plus', exact: true })).toBeVisible();
     expect(await page.evaluate(licenseKey => localStorage.getItem(licenseKey), LICENSE_KEY)).toBe('checkout-return-token');
   });
 
@@ -170,7 +182,7 @@ test.describe('license verification fail-closed policy', () => {
     await page.getByRole('button', { name: 'Unlock Plus' }).click();
     await page.locator('#license-token').fill('valid-token');
     await page.getByRole('button', { name: 'Verify license' }).click();
-    await expect(page.getByRole('button', { name: 'Cleanroom Plus' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Cleanroom Plus', exact: true })).toBeVisible();
     const stored = await page.evaluate(({ licenseKey, verdictKey }) => ({ token: localStorage.getItem(licenseKey), verdict: JSON.parse(localStorage.getItem(verdictKey) ?? 'null') }), { licenseKey: LICENSE_KEY, verdictKey: VERDICT_KEY });
     expect(stored.token).toBe('valid-token');
     expect(stored.verdict).toMatchObject({ valid: true, reason: 'ok' });
@@ -219,7 +231,7 @@ test.describe('license verification fail-closed policy', () => {
     }, { licenseKey: LICENSE_KEY, verdictKey: VERDICT_KEY });
     await context.setOffline(true);
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('button', { name: 'Cleanroom Plus' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Cleanroom Plus', exact: true })).toBeVisible();
   });
 
   test('rate-limited first verification remains locked', async ({ page }) => {
@@ -294,7 +306,7 @@ test('file controls expose visible focus, checkbox targets are 44px, and malform
   await page.getByRole('button', { name: 'Back to files' }).click();
   await page.locator('#source-file').focus();
   await expect(page.locator('label[for="source-file"]')).toHaveCSS('outline-width', '3px');
-  await page.getByRole('button', { name: 'Wire target fields' }).click();
+  await page.getByRole('button', { name: 'Map target fields' }).click();
   expect(await page.locator('.check').first().evaluate(element => element.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
   await page.locator('#recipe-file').setInputFiles({ name: 'broken.json', mimeType: 'application/json', buffer: Buffer.from('{broken') });
   await expect(page.getByRole('alert')).toContainText('Export a recipe from Cleanroom');
@@ -312,8 +324,37 @@ test('serves product routes, metadata, sitemap, and a real 404', async ({ page }
   expect(config.responseOverrides['404']).toEqual({ rewrite: '/404.html', statusCode: 404 });
   const manifest = await page.request.get('/manifest.webmanifest');
   expect(manifest.headers()['content-type']).toContain('application/manifest+json');
-  await page.goto('/404.html');
-  await expect(page.getByRole('heading', { name: 'This bench does not exist.' })).toBeVisible();
+  for (const path of ['/demo/', '/privacy/', '/terms/', '/404.html']) {
+    await page.goto(path);
+    await expect(page.locator('meta[name="twitter:title"]')).toHaveCount(1);
+    await expect(page.locator('meta[property="og:url"]')).toHaveCount(1);
+    await expect(page.locator('link[rel="manifest"]')).toHaveCount(1);
+  }
+  await expect(page.getByRole('heading', { name: 'Page not found.' })).toBeVisible();
+});
+
+test('opens the mapped demo workspace in the first viewport and keeps stage focus', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Try it with sample data' }).click();
+  await expect(page.getByText('customer-source-sample.csv')).toBeVisible();
+  await expect(page.locator('.mapping-scroll')).toBeVisible();
+  const mappingTop = await page.locator('.mapping-scroll').evaluate(element => element.getBoundingClientRect().top);
+  expect(mappingTop).toBeLessThan(844);
+  await page.getByRole('button', { name: /Run inspection/ }).focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#workspace-title')).toBeFocused();
+  await expect(page.getByText('Inspection complete: 2 accepted, 1 rejected.')).toBeVisible();
+});
+
+test('moves focus to headings for route and in-page navigation', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'How it works' }).click();
+  await expect(page.locator('#how-title')).toBeFocused();
+  await page.goBack();
+  await expect.poll(() => page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
+  await page.getByLabel('Primary navigation').getByRole('link', { name: 'Privacy' }).click();
+  await expect(page.getByRole('heading', { name: 'How your CSV data is handled' })).toBeFocused();
 });
 
 test('keeps the 390px workflow usable without page-level sideways scrolling', async ({ page }) => {

@@ -1,8 +1,8 @@
 # CSV Import Cleanroom
 
-CSV Import Cleanroom is an offline-first browser utility for operations staff preparing a messy CSV for a strict SaaS import template.
+CSV Import Cleanroom helps operations staff turn messy CSV files into strict import templates. It works offline after the first visit.
 
-It maps fields, runs named date, currency, and ID transforms, validates each row, explains rejects, and restores mappings from exported recipe JSON.
+Map source columns to target fields. Apply named date, currency, or ID transforms. Validate rows, explain rejects, and reuse an exported recipe.
 
 Live product: <https://csv-import-cleanroom.sociobot.in>
 
@@ -16,7 +16,7 @@ Live product: <https://csv-import-cleanroom.sociobot.in>
 - Recipe JSON contains field names and rules, not spreadsheet rows
 - A $19 one-time Plus license with no subscription for unlimited on-device saved recipes
 
-Every visitor-facing claim and its executable regression test is listed in [`.factory/claims.json`](.factory/claims.json). The demo sandbox is documented in [`.factory/demo.md`](.factory/demo.md).
+Every product promise and its test appears in [`.factory/claims.json`](.factory/claims.json). The demo sandbox is documented in [`.factory/demo.md`](.factory/demo.md).
 
 ## Develop and verify
 
@@ -33,7 +33,7 @@ The required production build command is:
 npm run build
 ```
 
-It type-checks the app, builds with Vite, injects hashed assets into the service-worker precache, and writes the deployable site to `dist/` with `dist/index.html` at its root.
+The build type-checks the app and bundles it with Vite. It adds hashed assets to the offline cache and writes the site to `dist/`.
 
 Run verification with:
 
@@ -43,11 +43,11 @@ npm run lint
 npm run test:e2e
 ```
 
-The Playwright suite uses Chromium 1.58.2 and covers demo isolation, sample conversion/export, serious/critical axe checks in each workflow state, keyboard focus, a 390 px layout, and an offline reload.
+Playwright uses Chromium 1.58.2. It checks demo isolation, conversion, exports, keyboard focus, the 390 px layout, offline reload, and serious or critical accessibility issues.
 
 ## Privacy and billing
 
-During normal and demo processing, spreadsheet rows remain in the browser. With a license present, verification is the only third-party background request. It includes no spreadsheet rows and runs at most daily. Checkout and license verification use the Sociobot billing API; no payment provider is embedded. See [`/privacy`](https://csv-import-cleanroom.sociobot.in/privacy/) and [`/terms`](https://csv-import-cleanroom.sociobot.in/terms/).
+During normal and demo processing, spreadsheet rows remain in the browser. With a license present, verification is the only third-party background request. It includes no spreadsheet rows and runs at most daily. Checkout and license verification use the Sociobot billing API. No payment provider is embedded. See [`/privacy`](https://csv-import-cleanroom.sociobot.in/privacy/) and [`/terms`](https://csv-import-cleanroom.sociobot.in/terms/).
 
 ## Deployment
 

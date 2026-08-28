@@ -68,5 +68,12 @@
     "where": "README, Privacy",
     "test": "npm run test:e2e -- --grep @claim:license-request-policy",
     "sandbox": "Mock a successful verification, load a private normal CSV, reload twice, and assert one token-only request to the Sociobot verification endpoint."
+  },
+  {
+    "id": "billing-route",
+    "claim": "Checkout and license verification use the Sociobot billing API; no payment provider is embedded.",
+    "where": "README, license panel, Terms",
+    "test": "npm run test:e2e -- --grep @claim:billing-route",
+    "sandbox": "Open the license panel from a fresh demo context, inspect the checkout destination and loaded document, and assert no payment iframe, provider script, or provider request exists before a visitor selects checkout."
   }
 ]

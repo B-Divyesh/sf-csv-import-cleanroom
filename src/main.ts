@@ -30,42 +30,45 @@ const options = (items: { id: string; label: string }[], selected: string) => it
 
 function render(): void {
   const ready = Boolean(state.source && state.target);
+  const workspaceHeading = ready ? `CSV import workspace · ${esc(state.source?.name)}` : 'Choose the source and target CSV files';
   app.innerHTML = `
     <header class="masthead">
       <a class="brand" href="/" aria-label="CSV Import Cleanroom home"><span class="brand-mark" aria-hidden="true">▦</span><span>CSV Import <strong>Cleanroom</strong></span></a>
       <nav aria-label="Primary navigation"><a href="/demo/">Demo</a><a href="#how">How it works</a><a href="/privacy/">Privacy</a><button class="text-button" data-action="license">${state.paid ? 'Cleanroom Plus' : 'Unlock Plus'}</button></nav>
     </header>
     <div class="network-strip" role="status"><span class="lamp ${navigator.onLine ? 'on' : ''}" aria-hidden="true"></span><span id="network-copy">${navigator.onLine ? 'Local processing ready' : 'Offline · local processing ready'}</span><span>Files never leave this device</span></div>
-    ${state.demo ? `<aside class="demo-banner" aria-label="Demo controls"><strong>Demo — sample data, nothing is saved</strong><span>This bench uses separate local demo storage.</span><button class="secondary compact" data-action="reset-demo">Reset demo</button><button class="text-button" data-action="start-real">Start for real</button></aside>` : ''}
+    ${state.demo ? `<aside class="demo-banner" aria-label="Demo controls"><strong>Demo — sample data, nothing is saved</strong><span>This demo uses separate local storage.</span><button class="secondary compact" data-action="reset-demo">Reset demo</button><button class="text-button" data-action="start-real">Start for real</button></aside>` : ''}
     <main id="main">
-      <section class="hero" aria-labelledby="page-title">
+      ${state.demo ? '' : `<section class="hero" aria-labelledby="page-title">
         <div class="hero-copy">
-          <p class="eyebrow">A preflight bench for strict imports</p>
-          <h1 id="page-title">Prepare CSV imports.<br><em>Keep the source intact.</em></h1>
-          <p class="lede">For operations staff and solo admins preparing strict SaaS imports from messy spreadsheets.</p>
+          <p class="eyebrow">Map, validate, and export CSV rows</p>
+          <h1 id="page-title">Prepare CSV imports.</h1>
+          <p class="lede">For operations staff and solo admins preparing a target template from messy spreadsheets.</p>
           <div class="hero-actions"><button class="primary" data-action="sample">Try it with sample data</button><a class="secondary button-link" href="#workspace">Open your files</a></div>
           <p class="action-note">The sample opens a mapped import with one explained rejection.</p>
           <ul class="assurances" aria-label="Product assurances"><li>Files stay on this device</li><li>Works offline after first visit</li><li>$19 once for unlimited recipes</li></ul>
         </div>
-        <figure class="hero-visual"><picture><source media="(max-width: 600px)" srcset="/assets/calibration-bench-mobile.webp"><img src="/assets/calibration-bench.webp" width="1200" height="800" fetchpriority="high" alt="An illustrated mid-century calibration bench aligning stacks of punched data cards"></picture><figcaption>Source in. Exact template out.</figcaption></figure>
-      </section>
+        <figure class="hero-visual"><picture><source media="(max-width: 600px)" srcset="/assets/calibration-bench-mobile.webp"><img src="/assets/calibration-bench.webp" width="1200" height="800" fetchpriority="high" alt="An illustrated mid-century calibration bench aligning stacks of punched data cards"></picture><figcaption>Accepted rows follow your target template.</figcaption></figure>
+      </section>`}
 
-      <section id="workspace" class="workspace" aria-labelledby="workspace-title">
-        <div class="workspace-heading"><div><p class="eyebrow">Conversion console</p><h2 id="workspace-title">${ready ? 'Bench 01 · ' + esc(state.source?.name) : 'Set up the bench'}</h2></div>${ready ? '<button class="danger-link" data-action="reset">Reset bench</button>' : ''}</div>
+      <section id="workspace" class="workspace ${state.demo ? 'demo-workspace' : ''}" aria-labelledby="workspace-title">
+        <div class="workspace-heading"><div><p class="eyebrow">CSV import workspace</p>${state.demo ? `<h1 id="workspace-title" tabindex="-1">${workspaceHeading}</h1>` : `<h2 id="workspace-title" tabindex="-1">${workspaceHeading}</h2>`}</div>${ready ? '<button class="danger-link" data-action="reset">Reset workspace</button>' : ''}</div>
         <ol class="stages" aria-label="Workflow stages">
-          ${stageButton(1, 'Load', 'Source + template')}${stageButton(2, 'Wire', 'Map + transform', !ready)}${stageButton(3, 'Inspect', 'Validate + export', !ready)}
+          ${stageButton(1, 'Load', 'Source + target template')}${stageButton(2, 'Map', 'Map + transform', !ready)}${stageButton(3, 'Inspect', 'Validate + export', !ready)}
         </ol>
         <div class="announcer" aria-live="polite">${esc(state.message)}</div>
         ${state.error ? `<div class="alert error" role="alert"><strong>Bench stopped.</strong> ${esc(state.error)} <button class="text-button" data-action="clear-error">Dismiss</button></div>` : ''}
         ${state.working ? '<div class="loading" role="status"><span class="spinner" aria-hidden="true"></span> Restoring the last local bench…</div>' : stageView()}
       </section>
 
-      <section id="how" class="how" aria-labelledby="how-title">
-        <div><p class="eyebrow">Built for repeat work</p><h2 id="how-title">The recipe is the artifact.</h2></div>
-        <ol><li><span>01</span><strong>Load two files</strong><p>Your untouched source and the target service’s header template.</p></li><li><span>02</span><strong>Name every decision</strong><p>Map columns, choose explicit transforms, and add strict rules.</p></li><li><span>03</span><strong>Inspect before export</strong><p>Separate accepted rows from explained rejects and reuse the JSON recipe.</p></li></ol>
+      ${state.demo ? '' : `<section id="how" class="how" aria-labelledby="how-title">
+        <div><p class="eyebrow">How CSV cleanup works</p><h2 id="how-title" tabindex="-1">Reuse the same import settings</h2></div>
+        <ol><li><span>01</span><strong>Load two files</strong><p>Load a source CSV and define the target template CSV once.</p></li><li><span>02</span><strong>Map target fields</strong><p>Map columns, choose explicit transforms, and add strict rules.</p></li><li><span>03</span><strong>Inspect before export</strong><p>Separate accepted rows from explained rejects and reuse the JSON recipe.</p></li></ol>
       </section>
+      <section class="privacy-facts" aria-labelledby="privacy-title"><div><p class="eyebrow">Privacy and limits</p><h2 id="privacy-title">Process CSV files on this device</h2></div><div><p>Spreadsheet rows stay in your browser during normal and demo processing.</p><p>Review the exported CSV before importing it into your target service.</p><a href="/privacy/">Read the privacy policy</a></div></section>
+      <section class="plus-section" aria-labelledby="plus-title"><div><p class="eyebrow">Cleanroom Plus</p><h2 id="plus-title">Save unlimited recipes for $19 once</h2><p>No subscription. CSV export, recipe export, rejection reports, and safety checks stay free.</p></div><div class="tier-list"><p><strong>Free</strong><br>One saved recipe and all exports.</p><p><strong>Plus · $19 once</strong><br>Unlimited saved recipes on this device.</p><button class="primary" data-action="license">View Cleanroom Plus — $19 once</button></div></section>`}
     </main>
-    <footer><div><strong>CSV Import Cleanroom</strong><p>Local CSV preparation for strict imports.</p></div><nav aria-label="Legal"><a href="/demo/">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><button class="text-button" data-action="license">${state.paid ? 'License active' : 'Cleanroom Plus · $19 once'}</button></nav><p class="provenance">Built by Param Factory · v1.0.5 · Hero artwork generated for this product with factory-image.</p></footer>
+    <footer><div><strong>CSV Import Cleanroom</strong><p>Local CSV preparation for strict imports.</p></div><nav aria-label="Legal"><a href="/demo/">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><button class="text-button" data-action="license">${state.paid ? 'License active' : 'View Cleanroom Plus — $19 once'}</button></nav><p class="provenance">Built by Param Factory · v1.0.6 · Hero artwork generated for this product with factory-image.</p></footer>
     ${state.showLicense ? licensePanel() : ''}
     <div id="toast" class="toast" hidden role="status"><span>An app update is ready.</span><button data-action="update">Update now</button></div>`;
   bindEvents();
@@ -83,17 +86,18 @@ function stageView(): string {
 
 function loadView(): string {
   return `<div class="load-grid">
-    ${fileStation('source', 'A', 'Messy source CSV', 'The rows you need to clean. This file is only read.', state.source)}
+    ${fileStation('source', 'A', 'Messy source CSV', 'The rows you need to clean.', state.source)}
     <div class="flow-arrow" aria-hidden="true">→</div>
     ${fileStation('target', 'B', 'Target template CSV', 'An empty template or example export. Its header defines the output.', state.target)}
   </div>
   <div class="limits"><strong>Local limits</strong><span>CSV only</span><span>10 MB per file</span><span>50,000 data rows</span><span>UTF-8 recommended</span></div>
   ${state.source?.warnings.length || state.target?.warnings.length ? `<div class="alert warning"><strong>Shape check:</strong> ${esc([...(state.source?.warnings ?? []), ...(state.target?.warnings ?? [])].join(' '))}</div>` : ''}
-  <div class="stage-actions"><button class="secondary" data-action="sample">Use sample files</button><button class="primary" data-action="continue" ${!state.source || !state.target ? 'disabled' : ''}>Wire target fields <span aria-hidden="true">→</span></button></div>`;
+  <div class="stage-actions"><button class="secondary" data-action="sample">Use sample files</button><button class="primary" data-action="continue" ${!state.source || !state.target ? 'disabled' : ''}>Map target fields <span aria-hidden="true">→</span></button></div>`;
 }
 
 function fileStation(kind: 'source' | 'target', letter: string, title: string, copy: string, file: CsvData | null): string {
-  return `<article class="file-station ${file ? 'loaded' : ''}"><div class="station-tag">Input ${letter}</div><div class="file-icon" aria-hidden="true">${file ? '✓' : 'CSV'}</div><h3>${title}</h3><p>${copy}</p>${file ? `<div class="file-readout"><strong>${esc(file.name)}</strong><span>${file.headers.length} columns · ${file.rows.length.toLocaleString()} rows</span></div>` : ''}<label class="secondary file-label" for="${kind}-file">${file ? 'Replace CSV' : 'Choose CSV'}<input id="${kind}-file" type="file" accept=".csv,text/csv" data-file="${kind}"></label></article>`;
+  const action = kind === 'source' ? 'source CSV' : 'target template CSV';
+  return `<article class="file-station ${file ? 'loaded' : ''}"><div class="station-tag">Input ${letter}</div><div class="file-icon" aria-hidden="true">${file ? '✓' : 'CSV'}</div><h3>${title}</h3><p>${copy}</p>${file ? `<div class="file-readout"><strong>${esc(file.name)}</strong><span>${file.headers.length} columns · ${file.rows.length.toLocaleString()} rows</span></div>` : ''}<label class="secondary file-label" for="${kind}-file">${file ? `Replace ${action}` : `Choose ${action}`}<input id="${kind}-file" type="file" accept=".csv,text/csv" data-file="${kind}"></label></article>`;
 }
 
 function mappingView(): string {
@@ -118,7 +122,7 @@ function recipeShelf(): string {
 }
 
 function inspectView(): string {
-  if (!state.result || !state.target) return `<div class="empty-inspect"><span class="dial" aria-hidden="true"></span><h3>No test run yet</h3><p>Wire the target fields, then run an inspection. No export is created until you review the results.</p><button class="primary" data-stage="2">Return to wiring</button></div>`;
+  if (!state.result || !state.target) return `<div class="empty-inspect"><span class="dial" aria-hidden="true"></span><h3>No test run yet</h3><p>Map the target fields, then run an inspection. No export is created until you review the results.</p><button class="primary" data-stage="2">Return to mapping</button></div>`;
   const result = state.result;
   const sampleRows = result.all.slice(0, 8);
   return `<div class="scoreboard" aria-label="Inspection summary"><div><span>Input rows</span><strong>${result.all.length.toLocaleString()}</strong></div><div class="good"><span>Accepted</span><strong>${result.accepted.length.toLocaleString()}</strong></div><div class="bad"><span>Rejected</span><strong>${result.rejected.length.toLocaleString()}</strong></div><div class="warn"><span>Values changed</span><strong>${result.lossyCount.toLocaleString()}</strong></div></div>
@@ -144,8 +148,13 @@ function licensePanel(): string {
 function bindEvents(): void {
   app.querySelectorAll<HTMLElement>('[data-stage]').forEach(element => element.addEventListener('click', () => {
     if (element instanceof HTMLButtonElement && element.disabled) return;
-    state.stage = Number(element.dataset.stage) as 1 | 2 | 3; state.error = ''; render(); scrollWorkspace();
+    state.stage = Number(element.dataset.stage) as 1 | 2 | 3; state.error = ''; render(); focusStage();
   }));
+  app.querySelector<HTMLAnchorElement>('a[href="#how"]')?.addEventListener('click', event => {
+    event.preventDefault();
+    history.pushState({ section: 'how' }, '', '#how');
+    document.querySelector<HTMLElement>('#how-title')?.focus();
+  });
   app.querySelectorAll<HTMLInputElement>('[data-file]').forEach(input => input.addEventListener('change', () => void loadFile(input)));
   app.querySelectorAll<HTMLElement>('[data-action]').forEach(element => element.addEventListener('click', () => void action(element.dataset.action ?? '')));
   app.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-map]').forEach(input => input.addEventListener('change', () => updateMapping(input)));
@@ -178,7 +187,7 @@ async function action(name: string): Promise<void> {
     if (state.demo) loadSample();
     else location.assign('/demo/');
   }
-  else if (name === 'continue') { state.stage = 2; render(); scrollWorkspace(); }
+  else if (name === 'continue') { state.stage = 2; render(); focusStage(); }
   else if (name === 'run') inspect();
   else if (name === 'reset') await resetBench();
   else if (name === 'clear-error') { state.error = ''; render(); }
@@ -205,7 +214,7 @@ function loadSample(): void {
     { target: 'started_on', source: 'Start Date', transform: 'date-iso', validation: 'iso-date', required: true, defaultValue: '' },
     { target: 'balance_usd', source: 'Balance', transform: 'currency', validation: 'number', required: false, defaultValue: '0' }
   ];
-  state.stage = 2; state.result = null; state.error = ''; state.message = 'Sample loaded. Review its explicit wiring, then run inspection.'; void persist(); render(); scrollWorkspace();
+  state.stage = 2; state.result = null; state.error = ''; state.message = 'Sample loaded. Review its explicit mapping, then run inspection.'; void persist(); render(); focusStage();
 }
 
 async function resetDemo(): Promise<void> {
@@ -233,11 +242,11 @@ function inspect(): void {
   if (!state.source || !state.target) return;
   if (!state.mappings.some(mapping => mapping.source || mapping.defaultValue)) { fail(new Error('Connect at least one target field to a source column or fallback value.')); state.stage = 2; return; }
   state.result = runRecipe(state.source.headers, state.source.rows, state.mappings); state.stage = 3;
-  state.message = `Inspection complete: ${state.result.accepted.length} accepted, ${state.result.rejected.length} rejected.`; render(); scrollWorkspace();
+  state.message = `Inspection complete: ${state.result.accepted.length} accepted, ${state.result.rejected.length} rejected.`; render(); focusStage();
 }
 
 async function resetBench(): Promise<void> {
-  if (!confirm(`Reset “${state.source?.name ?? 'this bench'}”? Your source files and mappings will be removed from this device. Saved recipes stay available.`)) return;
+  if (!confirm(`Reset “${state.source?.name ?? 'this workspace'}”? Your source files and mappings will be removed from this device. Saved recipes stay available.`)) return;
   state.source = null; state.target = null; state.mappings = []; state.result = null; state.stage = 1; state.message = 'Bench reset.'; await clearDraft(); render();
 }
 
@@ -260,7 +269,7 @@ async function importRecipe(file?: File): Promise<void> {
 
 async function saveCurrentRecipe(): Promise<void> {
   if (!state.mappings.length) return;
-  if (!state.paid && state.recipes.length >= 1) { state.showLicense = true; state.message = 'The free bench saves one recipe locally. JSON export always stays free.'; render(); return; }
+  if (!state.paid && state.recipes.length >= 1) { state.showLicense = true; state.message = 'The free workspace saves one recipe locally. JSON export always stays free.'; render(); return; }
   const suggested = state.target?.name.replace(/\.csv$/i, '') || 'My import';
   const name = prompt('Name this recipe', suggested)?.trim(); if (!name) return;
   const recipe = makeRecipe(name, state.mappings); await saveRecipe(recipe); state.recipes = await listRecipes(); state.message = `Recipe “${name}” saved on this device.`; render();
@@ -288,7 +297,11 @@ function download(name: string, content: string, type: string): void { const url
 function slug(name: string): string { return name.replace(/\.csv$/i, '').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase() || 'cleanroom'; }
 function persist(): Promise<IDBValidKey> { return saveDraft(state.source, state.target, state.mappings); }
 function fail(error: unknown): void { state.error = error instanceof Error ? error.message : 'Something went wrong. Try the file again.'; state.message = ''; render(); }
-function scrollWorkspace(): void { document.querySelector('#workspace')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); }
+function focusStage(): void {
+  const target = document.querySelector<HTMLElement>('#workspace-title');
+  target?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  requestAnimationFrame(() => target?.focus());
+}
 
 async function initialise(): Promise<void> {
   captureLicense(); state.paid = hasOptimisticLicense(); render();
@@ -302,7 +315,7 @@ async function initialise(): Promise<void> {
       state.recipes = recipes;
     }
     state.working = false; render();
-  } catch { state.working = false; state.error = 'Saved local work could not be opened. You can still start a new bench.'; render(); }
+  } catch { state.working = false; state.error = 'Saved local work could not be opened. You can still start a new workspace.'; render(); }
   if (localStorage.getItem('sb_license:csv-import-cleanroom')) {
     const verdict = await verifyLicense();
     if (verdict.valid !== state.paid || !verdict.valid) { state.paid = verdict.valid; if (!verdict.valid) state.message = verdict.reason === 'unavailable' ? licenseFailureMessage(verdict.reason) : 'Your saved license is no longer active.'; render(); }
@@ -322,4 +335,16 @@ function registerServiceWorker(): void {
 
 function showUpdate(registration: ServiceWorkerRegistration): void { const toast = document.querySelector<HTMLDivElement>('#toast'); if (!toast) return; toast.hidden = false; toast.querySelector('button')?.addEventListener('click', () => registration.waiting?.postMessage({ type: 'SKIP_WAITING' })); }
 window.addEventListener('online', render); window.addEventListener('offline', render);
+function focusRouteDestination(): void {
+  const focus = () => {
+    if (location.hash === '#how') document.querySelector<HTMLElement>('#how-title')?.focus();
+    else document.querySelector<HTMLElement>('#page-title, #workspace-title')?.focus();
+  };
+  requestAnimationFrame(focus);
+  setTimeout(focus, 50);
+}
+window.addEventListener('popstate', focusRouteDestination);
+window.addEventListener('hashchange', focusRouteDestination);
+window.addEventListener('pageshow', event => { if (event.persisted) focusRouteDestination(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) focusRouteDestination(); });
 void initialise();
