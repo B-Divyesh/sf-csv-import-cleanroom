@@ -1,6 +1,6 @@
 # Polish round 1 — review closure
 
-Repair commit: `f5f27f1a78484022df4726c0006c98990496a0b5`.
+Repair commits: `f5f27f1a78484022df4726c0006c98990496a0b5` and `34f36f8857b06dbb46eda023bbd5ab9f8a014612`.
 
 | Finding | Change made | Evidence |
 | --- | --- | --- |
