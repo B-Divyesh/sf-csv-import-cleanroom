@@ -376,9 +376,14 @@ test('has no serious or critical accessibility violations in every workflow stat
   const mapping = await new AxeBuilder({ page }).analyze();
   expect(mapping.violations.filter(item => ['serious', 'critical'].includes(item.impact ?? '')), 'mapping').toEqual([]);
   expect(mapping.violations.filter(item => item.id === 'heading-order'), 'demo mapping heading outline').toEqual([]);
+  await page.getByRole('button', { name: /Inspect/ }).click();
+  const emptyInspection = await new AxeBuilder({ page }).analyze();
+  expect(emptyInspection.violations.filter(item => item.id === 'heading-order'), 'empty inspection heading outline').toEqual([]);
+  await page.getByRole('button', { name: 'Return to mapping' }).click();
   await page.getByRole('button', { name: /Run inspection/ }).click();
   const inspection = await new AxeBuilder({ page }).analyze();
   expect(inspection.violations.filter(item => ['serious', 'critical'].includes(item.impact ?? '')), 'inspection').toEqual([]);
+  expect(inspection.violations.filter(item => item.id === 'heading-order'), 'inspection heading outline').toEqual([]);
   await page.getByRole('button', { name: 'View Cleanroom Plus — $19 once' }).first().click();
   const license = await new AxeBuilder({ page }).analyze();
   expect(license.violations.filter(item => ['serious', 'critical'].includes(item.impact ?? '')), 'license dialog').toEqual([]);
@@ -514,13 +519,26 @@ test('keeps the demo identity and controls in the settled mobile workspace viewp
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/demo/');
   await expect(page.locator('#workspace-title')).toBeFocused();
+  const demoMessage = page.getByText('Demo — sample data, nothing is saved');
+  const workspaceTitle = page.locator('#workspace-title');
+  const workspaceReset = page.getByRole('button', { name: 'Reset workspace' });
   for (const control of [
-    page.getByText('Demo — sample data, nothing is saved'),
+    demoMessage,
     page.getByRole('button', { name: 'Reset demo' }),
     page.getByRole('button', { name: 'Start for real' })
   ]) {
     await expect(control).toBeInViewport();
   }
+  await expect(workspaceReset).toBeInViewport();
+  const mastheadBox = await page.locator('.masthead').boundingBox();
+  const messageBox = await demoMessage.boundingBox();
+  const bannerBox = await page.locator('.demo-banner').boundingBox();
+  const titleBox = await workspaceTitle.boundingBox();
+  const workspaceResetBox = await workspaceReset.boundingBox();
+  expect(messageBox!.y).toBeGreaterThanOrEqual(mastheadBox!.y + mastheadBox!.height);
+  expect(titleBox!.y).toBeGreaterThanOrEqual(bannerBox!.y + bannerBox!.height);
+  expect(workspaceResetBox!.y).toBeGreaterThanOrEqual(bannerBox!.y + bannerBox!.height);
+  expect(titleBox!.y + titleBox!.height).toBeLessThan(844);
 });
 
 test('moves focus to headings for route and in-page navigation', async ({ page }) => {

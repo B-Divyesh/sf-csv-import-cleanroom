@@ -136,17 +136,18 @@ function recipeShelf(): string {
 }
 
 function inspectView(): string {
-  if (!state.result || !state.target) return `<div class="empty-inspect"><span class="dial" aria-hidden="true"></span><h3>No test run yet</h3><p>Map the target fields, then run an inspection. No export is created until you review the results.</p><button class="primary" data-stage="2">Return to mapping</button></div>`;
+  const headingTag = state.demo ? 'h2' : 'h3';
+  if (!state.result || !state.target) return `<div class="empty-inspect"><span class="dial" aria-hidden="true"></span><${headingTag} class="inspection-heading">No test run yet</${headingTag}><p>Map the target fields, then run an inspection. No export is created until you review the results.</p><button class="primary" data-stage="2">Return to mapping</button></div>`;
   const result = state.result;
   const sampleRows = result.all.slice(0, 8);
   return `<div class="scoreboard" aria-label="Inspection summary"><div><span>Input rows</span><strong>${result.all.length.toLocaleString()}</strong></div><div class="good"><span>Accepted</span><strong>${result.accepted.length.toLocaleString()}</strong></div><div class="bad"><span>Rejected</span><strong>${result.rejected.length.toLocaleString()}</strong></div><div class="warn"><span>Values changed</span><strong>${result.lossyCount.toLocaleString()}</strong></div></div>
   ${result.formulaCount ? `<div class="alert safety"><strong>Formula-like values will be escaped.</strong> ${result.formulaCount} ${result.formulaCount === 1 ? 'cell starts' : 'cells start'} like a spreadsheet formula. Export will prefix each with an apostrophe so opening the CSV cannot execute it.</div>` : ''}
   <div class="inspection-grid">
-    <section aria-labelledby="preview-title"><div class="section-heading"><div><h3 id="preview-title">Output preview</h3><p>First ${sampleRows.length} rows · changed cells are marked.</p></div></div><div class="table-scroll" tabindex="0" aria-label="Output preview table"><table class="preview-table"><thead><tr><th>Source row</th>${state.target.headers.map(header => `<th>${esc(header)}</th>`).join('')}<th>Status</th></tr></thead><tbody>${sampleRows.map(row => `<tr class="${row.errors.length ? 'rejected' : ''}"><th>${row.sourceRow}</th>${row.values.map((value, index) => `<td class="${row.lossy.some(change => change.startsWith(state.target!.headers[index] + ':')) ? 'changed' : ''}"><span>${esc(value || '—')}</span></td>`).join('')}<td><span class="status-pill ${row.errors.length ? 'fail' : 'pass'}">${row.errors.length ? 'Rejected' : 'Accepted'}</span></td></tr>`).join('')}</tbody></table></div></section>
-    <section class="diagnostics" aria-labelledby="diagnostics-title"><div class="section-heading"><div><h3 id="diagnostics-title">Rejected-row notes</h3><p>Reasons use the target field names.</p></div></div>${rejectionList(result)}</section>
+    <section aria-labelledby="preview-title"><div class="section-heading"><div><${headingTag} class="inspection-heading" id="preview-title">Output preview</${headingTag}><p>First ${sampleRows.length} rows · changed cells are marked.</p></div></div><div class="table-scroll" tabindex="0" aria-label="Output preview table"><table class="preview-table"><thead><tr><th>Source row</th>${state.target.headers.map(header => `<th>${esc(header)}</th>`).join('')}<th>Status</th></tr></thead><tbody>${sampleRows.map(row => `<tr class="${row.errors.length ? 'rejected' : ''}"><th>${row.sourceRow}</th>${row.values.map((value, index) => `<td class="${row.lossy.some(change => change.startsWith(state.target!.headers[index] + ':')) ? 'changed' : ''}"><span>${esc(value || '—')}</span></td>`).join('')}<td><span class="status-pill ${row.errors.length ? 'fail' : 'pass'}">${row.errors.length ? 'Rejected' : 'Accepted'}</span></td></tr>`).join('')}</tbody></table></div></section>
+    <section class="diagnostics" aria-labelledby="diagnostics-title"><div class="section-heading"><div><${headingTag} class="inspection-heading" id="diagnostics-title">Rejected-row notes</${headingTag}><p>Reasons use the target field names.</p></div></div>${rejectionList(result)}</section>
   </div>
   <details class="change-log" ${result.lossyCount ? '' : 'hidden'}><summary>Review ${result.lossyCount} changed ${result.lossyCount === 1 ? 'value' : 'values'}</summary><ul>${result.all.flatMap(row => row.lossy.map(change => `<li><strong>Row ${row.sourceRow}</strong> ${esc(change)}</li>`)).slice(0, 100).join('')}</ul>${result.lossyCount > 100 ? '<p>Showing the first 100 changes.</p>' : ''}</details>
-  <div class="export-rack"><div><p class="eyebrow">Export inspection results</p><h3>${result.accepted.length ? 'Accepted rows are ready.' : 'Fix the rejected rows before exporting.'}</h3><p>The target CSV contains accepted rows only. The rejection report preserves row numbers and explanations.</p></div><div><button class="primary" data-action="export-target" ${!result.accepted.length ? 'disabled' : ''}>Export target CSV</button><button class="secondary" data-action="export-rejects" ${!result.rejected.length ? 'disabled' : ''}>Export rejection report</button><button class="secondary" data-action="export-recipe">Export recipe JSON</button></div></div>
+  <div class="export-rack"><div><p class="eyebrow">Export inspection results</p><${headingTag} class="inspection-heading">${result.accepted.length ? 'Accepted rows are ready.' : 'Fix the rejected rows before exporting.'}</${headingTag}><p>The target CSV contains accepted rows only. The rejection report preserves row numbers and explanations.</p></div><div><button class="primary" data-action="export-target" ${!result.accepted.length ? 'disabled' : ''}>Export target CSV</button><button class="secondary" data-action="export-rejects" ${!result.rejected.length ? 'disabled' : ''}>Export rejection report</button><button class="secondary" data-action="export-recipe">Export recipe JSON</button></div></div>
   <div class="stage-actions"><button class="secondary" data-stage="2">Back to mapping</button><button class="secondary" data-action="run">Run inspection again</button></div>`;
 }
 
@@ -313,8 +314,9 @@ function persist(): Promise<IDBValidKey> { return saveDraft(state.source, state.
 function fail(error: unknown): void { state.error = error instanceof Error ? error.message : 'Something went wrong. Try the file again.'; state.message = ''; render(); }
 function focusStage(): void {
   const target = document.querySelector<HTMLElement>('#workspace-title');
-  target?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
-  requestAnimationFrame(() => target?.focus());
+  const workspace = document.querySelector<HTMLElement>('#workspace');
+  workspace?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  requestAnimationFrame(() => target?.focus({ preventScroll: true }));
 }
 
 async function initialise(): Promise<void> {
@@ -353,7 +355,8 @@ window.addEventListener('online', render); window.addEventListener('offline', re
 function focusRouteDestination(): void {
   const focus = () => {
     if (location.hash === '#how') document.querySelector<HTMLElement>('#how-title')?.focus();
-    else if (location.hash === '#workspace' || state.demo) document.querySelector<HTMLElement>('#workspace-title')?.focus();
+    else if (state.demo) focusStage();
+    else if (location.hash === '#workspace') document.querySelector<HTMLElement>('#workspace-title')?.focus();
     else document.querySelector<HTMLElement>('#page-title')?.focus();
   };
   requestAnimationFrame(focus);
