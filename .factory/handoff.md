@@ -37,6 +37,8 @@ Build output remains within static budgets: main JS 31.67 KB raw / 11.22 KB gzip
 
 Use `npm run dev` for local work. Deploy the generated `dist/` directory as the static app; it contains `index.html` at its root and `staticwebapp.config.json`. The repository’s configured `main` push is the handoff point for the factory static deployment; no DNS, billing, or other infrastructure was changed.
 
+Repair commit `a4c8103` was pushed to `origin/main`. At the post-push live-identity check (2026-08-28 10:34 UTC), `https://csv-import-cleanroom.sociobot.in/` still returned the prior page and a 09:08 UTC `Last-Modified` value. The repository has no GitHub Actions deployment workflow and no static-host deployment target/configuration was present in the worktree, so this container cannot activate the factory-owned live deployment. The pushed commit and `dist/staticwebapp.config.json` are ready for that deployment step.
+
 ## Known limits
 
 - CSV only; the explicit local cap remains 10 MB and 50,000 data rows per file.
