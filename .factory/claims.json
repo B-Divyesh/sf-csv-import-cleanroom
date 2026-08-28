@@ -8,10 +8,10 @@
   },
   {
     "id": "csv-export",
-    "claim": "Exports accepted sample rows as CSV.",
-    "where": "Export rack, README",
+    "claim": "The free workflow exports accepted sample rows as CSV and a reusable recipe as JSON.",
+    "where": "Export rack, license panel, README, Terms",
     "test": "npm run test:e2e -- --grep @claim:csv-export",
-    "sandbox": "Run the shipped demo inspection and read the downloaded CSV."
+    "sandbox": "Without a license, run the shipped demo and inspect both downloaded files; assert no license gate opens."
   },
   {
     "id": "formula-safe-export",
@@ -29,14 +29,14 @@
   },
   {
     "id": "on-device-processing",
-    "claim": "Files stay on this device during the demo flow.",
-    "where": "Landing assurance, network strip, README",
+    "claim": "Spreadsheet rows stay in the browser during normal and demo processing.",
+    "where": "Landing assurance, network strip, README, Privacy",
     "test": "npm run test:e2e -- --grep @claim:on-device-processing",
-    "sandbox": "Record every browser request while loading and inspecting /demo/; assert every request is same-origin."
+    "sandbox": "Record requests while loading private normal files and running /demo/; assert all requests are same-origin and no row value appears in a URL."
   },
   {
     "id": "plus-price",
-    "claim": "Cleanroom Plus is a $19 one-time license for unlimited on-device saved recipes.",
+    "claim": "Cleanroom Plus costs $19 once, has no subscription, and includes unlimited on-device saved recipes.",
     "where": "Landing assurance, license panel, README, Terms",
     "test": "npm run test:e2e -- --grep @claim:plus-price",
     "sandbox": "Open the license panel from a fresh browser context and assert the price and included feature."
@@ -47,5 +47,26 @@
     "where": "Load-stage limits, README, Terms",
     "test": "npm test -- --testNamePattern @claim:file-limits",
     "sandbox": "Construct files beyond both boundaries and assert the parser rejects them with the advertised limits."
+  },
+  {
+    "id": "recipe-data-separation",
+    "claim": "Recipe JSON contains field names and rules, never spreadsheet rows.",
+    "where": "Saved recipes panel, README, Privacy",
+    "test": "npm run test:e2e -- --grep @claim:recipe-data-separation",
+    "sandbox": "Export the mapped sample recipe, validate its schema, and assert no shipped spreadsheet value is present."
+  },
+  {
+    "id": "conversion-workflow",
+    "claim": "Named transforms run, every output row is validated, rejects use target-field explanations, and an exported recipe can restore the mapping.",
+    "where": "Workspace, How it works, README",
+    "test": "npm run test:e2e -- --grep @claim:conversion-workflow",
+    "sandbox": "Use the sample mapping, export it, alter it, import it, run inspection, and inspect transformed output plus target-field errors."
+  },
+  {
+    "id": "license-request-policy",
+    "claim": "With a license present, verification is the only third-party background request, includes no spreadsheet rows, and runs at most once daily.",
+    "where": "README, Privacy",
+    "test": "npm run test:e2e -- --grep @claim:license-request-policy",
+    "sandbox": "Mock a successful verification, load a private normal CSV, reload twice, and assert one token-only request to the Sociobot verification endpoint."
   }
 ]

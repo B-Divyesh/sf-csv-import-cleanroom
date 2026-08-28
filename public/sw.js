@@ -1,4 +1,4 @@
-const VERSION = 'cleanroom-v1.0.4';
+const VERSION = 'cleanroom-v1.0.5';
 const SHELL = `${VERSION}-shell`;
 const ASSETS = `${VERSION}-assets`;
 const BUILD_ASSETS = [];
@@ -33,12 +33,12 @@ self.addEventListener('fetch', event => {
         return response;
       } catch {
         const shell = await caches.open(SHELL);
-        return (await shell.match(event.request)) || (await shell.match(new URL(url.pathname, self.location.origin).href)) || (await shell.match(new URL('/', self.location.origin).href)) || (await shell.match(new URL('/offline.html', self.location.origin).href)) || new Response('Offline', { status: 503, statusText: 'Offline' });
+        return (await shell.match(event.request, { ignoreVary: true })) || (await shell.match(new URL(url.pathname, self.location.origin).href, { ignoreVary: true })) || (await shell.match(new URL('/', self.location.origin).href, { ignoreVary: true })) || (await shell.match(new URL('/offline.html', self.location.origin).href, { ignoreVary: true })) || new Response('Offline', { status: 503, statusText: 'Offline' });
       }
     })());
     return;
   }
-  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
+  event.respondWith(caches.match(event.request, { ignoreVary: true }).then(cached => cached || fetch(event.request).then(response => {
     if (response.ok) caches.open(ASSETS).then(cache => cache.put(event.request, response.clone()));
     return response;
   })));

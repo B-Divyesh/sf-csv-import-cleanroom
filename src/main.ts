@@ -65,7 +65,7 @@ function render(): void {
         <ol><li><span>01</span><strong>Load two files</strong><p>Your untouched source and the target service’s header template.</p></li><li><span>02</span><strong>Name every decision</strong><p>Map columns, choose explicit transforms, and add strict rules.</p></li><li><span>03</span><strong>Inspect before export</strong><p>Separate accepted rows from explained rejects and reuse the JSON recipe.</p></li></ol>
       </section>
     </main>
-    <footer><div><strong>CSV Import Cleanroom</strong><p>Local CSV preparation for strict imports.</p></div><nav aria-label="Legal"><a href="/demo/">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><button class="text-button" data-action="license">${state.paid ? 'License active' : 'Cleanroom Plus · $19 once'}</button></nav><p class="provenance">Built by Param Factory · v1.0.4 · Hero artwork generated for this product with factory-image.</p></footer>
+    <footer><div><strong>CSV Import Cleanroom</strong><p>Local CSV preparation for strict imports.</p></div><nav aria-label="Legal"><a href="/demo/">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><button class="text-button" data-action="license">${state.paid ? 'License active' : 'Cleanroom Plus · $19 once'}</button></nav><p class="provenance">Built by Param Factory · v1.0.5 · Hero artwork generated for this product with factory-image.</p></footer>
     ${state.showLicense ? licensePanel() : ''}
     <div id="toast" class="toast" hidden role="status"><span>An app update is ready.</span><button data-action="update">Update now</button></div>`;
   bindEvents();
@@ -138,7 +138,7 @@ function rejectionList(result: RunResult): string {
 }
 
 function licensePanel(): string {
-  return `<div class="modal-backdrop"><section class="license-panel" role="dialog" aria-modal="true" aria-labelledby="license-title"><button class="modal-close" data-action="close-license" aria-label="Close license panel">×</button><p class="eyebrow">One-time license</p><h2 id="license-title">Cleanroom Plus</h2>${state.paid ? '<p class="license-active"><span class="lamp on"></span> License active on this device</p>' : '<p class="price"><strong>$19</strong> once</p>'}<p>Keep the free workflow forever, including safe CSV and recipe exports. Plus unlocks unlimited on-device saved recipes for recurring operations.</p><ul><li>Unlimited saved recipes on this device</li><li>Restore on every device with your license</li><li>No spreadsheet uploads or subscription</li></ul>${state.paid ? '' : `<a class="primary button-link full" href="${CHECKOUT_URL}">Buy Cleanroom Plus</a>`}<div class="restore"><label for="license-token">Have a license? Paste it here</label><div><input id="license-token" autocomplete="off" spellcheck="false" placeholder="License token"><button class="secondary" data-action="restore-license">Verify license</button></div></div><p class="legal-note">Sociobot/Dodo is the merchant of record. Refunds are handled there and revoke the license. <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a></p></section></div>`;
+  return `<div class="modal-backdrop"><section class="license-panel" role="dialog" aria-modal="true" aria-labelledby="license-title"><button class="modal-close" data-action="close-license" aria-label="Close license panel">×</button><p class="eyebrow">One-time license</p><h2 id="license-title">Cleanroom Plus</h2>${state.paid ? '<p class="license-active"><span class="lamp on"></span> License active on this device</p>' : '<p class="price"><strong>$19</strong> once</p>'}<p>Keep the free workflow, including safe CSV and recipe exports. Plus unlocks unlimited on-device saved recipes for recurring operations.</p><ul><li>Unlimited saved recipes on this device</li><li>Paste your license on another device to restore Plus</li><li>No spreadsheet uploads or subscription</li></ul>${state.paid ? '' : `<a class="primary button-link full" href="${CHECKOUT_URL}">Buy Cleanroom Plus</a>`}<div class="restore"><label for="license-token">Have a license? Paste it here</label><div><input id="license-token" autocomplete="off" spellcheck="false" placeholder="License token"><button class="secondary" data-action="restore-license">Verify license</button></div></div><p class="legal-note">Sociobot/Dodo is the merchant of record. Refunds are handled there and revoke the license. <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a></p></section></div>`;
 }
 
 function bindEvents(): void {
@@ -276,7 +276,12 @@ async function removeRecipe(id: string): Promise<void> { const recipe = state.re
 
 async function restoreLicense(): Promise<void> {
   const token = app.querySelector<HTMLInputElement>('#license-token')?.value.trim(); if (!token) { fail(new Error('Paste the license token from your receipt.')); return; }
-  storeLicense(token); const verdict = await verifyLicense(true); state.paid = verdict.valid; state.showLicense = !verdict.valid; state.message = verdict.valid ? 'Cleanroom Plus is active on this device.' : 'That license could not be verified. Check the token and try again.'; render();
+  storeLicense(token); const verdict = await verifyLicense(true); state.paid = verdict.valid; state.showLicense = !verdict.valid;
+  state.message = verdict.valid ? 'Cleanroom Plus is active on this device.' : licenseFailureMessage(verdict.reason); render();
+}
+
+function licenseFailureMessage(reason?: string): string {
+  return reason === 'unavailable' ? 'License verification is unavailable. Connect to the internet and try again. The free workflow is still available.' : 'That license is not active. Check the token or buy a new license.';
 }
 
 function download(name: string, content: string, type: string): void { const url = URL.createObjectURL(new Blob(['\uFEFF', content], { type })); const anchor = document.createElement('a'); anchor.href = url; anchor.download = name; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
@@ -299,7 +304,8 @@ async function initialise(): Promise<void> {
     state.working = false; render();
   } catch { state.working = false; state.error = 'Saved local work could not be opened. You can still start a new bench.'; render(); }
   if (localStorage.getItem('sb_license:csv-import-cleanroom')) {
-    const verdict = await verifyLicense(); if (verdict.valid !== state.paid) { state.paid = verdict.valid; if (!verdict.valid) state.message = 'Your saved license is no longer active.'; render(); }
+    const verdict = await verifyLicense();
+    if (verdict.valid !== state.paid || !verdict.valid) { state.paid = verdict.valid; if (!verdict.valid) state.message = verdict.reason === 'unavailable' ? licenseFailureMessage(verdict.reason) : 'Your saved license is no longer active.'; render(); }
   }
   registerServiceWorker();
 }

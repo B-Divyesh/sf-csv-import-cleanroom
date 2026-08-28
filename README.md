@@ -1,19 +1,20 @@
 # CSV Import Cleanroom
 
-CSV Import Cleanroom is an offline-first browser utility for operations staff who need to turn a messy CSV into a strict SaaS import template without editing the original file or writing a script.
+CSV Import Cleanroom is an offline-first browser utility for operations staff preparing a messy CSV for a strict SaaS import template.
 
-The product loads a source CSV and target header template, lets the operator explicitly map each field, applies named date/currency/ID transforms, validates every output row, explains rejects in target-column language, and exports an accepted-row CSV plus a reusable JSON recipe. Spreadsheet content is processed in the browser.
+It maps fields, runs named date, currency, and ID transforms, validates each row, explains rejects, and restores mappings from exported recipe JSON.
 
 Live product: <https://csv-import-cleanroom.sociobot.in>
 
 ## Capabilities
 
 - A one-click [isolated sample demo](https://csv-import-cleanroom.sociobot.in/demo/)
-- Accepted-row CSV export from the sample inspection
+- Free accepted-row CSV and reusable recipe JSON exports
 - Formula-like cells neutralized in every CSV export
 - Offline reload after the first visit
 - Local limits of 10 MB and 50,000 data rows per file
-- A $19 one-time Plus license for unlimited on-device saved recipes
+- Recipe JSON contains field names and rules, not spreadsheet rows
+- A $19 one-time Plus license with no subscription for unlimited on-device saved recipes
 
 Every visitor-facing claim and its executable regression test is listed in [`.factory/claims.json`](.factory/claims.json). The demo sandbox is documented in [`.factory/demo.md`](.factory/demo.md).
 
@@ -46,7 +47,7 @@ The Playwright suite uses Chromium 1.58.2 and covers demo isolation, sample conv
 
 ## Privacy and billing
 
-During normal and demo processing, spreadsheet rows remain in the browser. License verification is the only background API request and runs at most daily when a license is present. Checkout and license verification use the Sociobot billing API; no payment provider is embedded. See [`/privacy`](https://csv-import-cleanroom.sociobot.in/privacy/) and [`/terms`](https://csv-import-cleanroom.sociobot.in/terms/).
+During normal and demo processing, spreadsheet rows remain in the browser. With a license present, verification is the only third-party background request. It includes no spreadsheet rows and runs at most daily. Checkout and license verification use the Sociobot billing API; no payment provider is embedded. See [`/privacy`](https://csv-import-cleanroom.sociobot.in/privacy/) and [`/terms`](https://csv-import-cleanroom.sociobot.in/terms/).
 
 ## Deployment
 
