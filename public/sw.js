@@ -1,15 +1,16 @@
-const VERSION = 'cleanroom-v1.0.3';
+const VERSION = 'cleanroom-v1.0.4';
 const SHELL = `${VERSION}-shell`;
 const ASSETS = `${VERSION}-assets`;
 const BUILD_ASSETS = [];
-const PRECACHE = [...new Set(['/', '/index.html', '/manifest.webmanifest', '/offline.html', '/privacy/', '/terms/', '/assets/icon.svg', '/assets/icon-192.png', '/assets/icon-512.png', '/assets/calibration-bench-mobile.webp', '/assets/calibration-bench.webp', ...BUILD_ASSETS])];
+const PRECACHE = [...new Set(['/', '/index.html', '/demo/', '/privacy/', '/terms/', '/404.html', '/manifest.webmanifest', '/offline.html', '/sitemap.xml', '/robots.txt', '/assets/icon.svg', '/assets/icon-192.png', '/assets/icon-512.png', '/assets/calibration-bench-mobile.webp', '/assets/calibration-bench.webp', '/assets/social-card.webp', ...BUILD_ASSETS])];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(SHELL).then(async cache => {
     for (const path of PRECACHE) {
-      const response = await fetch(new Request(path, { cache: 'reload' }));
+      const url = new URL(path, self.location.origin).toString();
+      const response = await fetch(new Request(url, { cache: 'reload' }));
       if (!response.ok) throw new Error(`Could not precache ${path}`);
-      await cache.put(path, response);
+      await cache.put(url, response);
     }
   }));
 });
@@ -24,11 +25,17 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   if (url.origin !== location.origin) return;
   if (event.request.mode === 'navigate') {
-    event.respondWith(fetch(event.request).then(response => {
-      const copy = response.clone();
-      caches.open(SHELL).then(cache => cache.put(event.request, copy));
-      return response;
-    }).catch(async () => (await caches.match(event.request)) || (await caches.match('/')) || caches.match('/offline.html')));
+    event.respondWith((async () => {
+      try {
+        const response = await fetch(event.request);
+        const copy = response.clone();
+        void caches.open(SHELL).then(cache => cache.put(event.request, copy));
+        return response;
+      } catch {
+        const shell = await caches.open(SHELL);
+        return (await shell.match(event.request)) || (await shell.match(new URL(url.pathname, self.location.origin).href)) || (await shell.match(new URL('/', self.location.origin).href)) || (await shell.match(new URL('/offline.html', self.location.origin).href)) || new Response('Offline', { status: 503, statusText: 'Offline' });
+      }
+    })());
     return;
   }
   event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {

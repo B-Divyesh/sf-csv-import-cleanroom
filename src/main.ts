@@ -2,7 +2,7 @@ import './styles.css';
 import { guardFile, parseCsv, serializeCsv } from './csv';
 import { blankMappings, makeRecipe, runRecipe, TRANSFORMS, validateRecipe, VALIDATIONS } from './engine';
 import { captureLicense, CHECKOUT_URL, hasOptimisticLicense, storeLicense, verifyLicense } from './license';
-import { clearDraft, deleteRecipe, listRecipes, loadDraft, saveDraft, saveRecipe } from './storage';
+import { clearDraft, clearWorkspace, deleteRecipe, listRecipes, loadDraft, saveDraft, saveRecipe, useDemoStorage } from './storage';
 import type { CsvData, FieldMapping, Recipe, RunResult } from './types';
 
 interface AppState {
@@ -17,9 +17,12 @@ interface AppState {
   error: string;
   working: boolean;
   showLicense: boolean;
+  demo: boolean;
 }
 
-const state: AppState = { source: null, target: null, mappings: [], result: null, stage: 1, recipes: [], paid: false, message: '', error: '', working: true, showLicense: false };
+const demoRoute = location.pathname === '/demo' || location.pathname === '/demo/' || new URLSearchParams(location.search).get('demo') === '1';
+useDemoStorage(demoRoute);
+const state: AppState = { source: null, target: null, mappings: [], result: null, stage: 1, recipes: [], paid: false, message: '', error: '', working: true, showLicense: false, demo: demoRoute };
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
 const esc = (value: unknown) => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character]!);
@@ -30,17 +33,19 @@ function render(): void {
   app.innerHTML = `
     <header class="masthead">
       <a class="brand" href="/" aria-label="CSV Import Cleanroom home"><span class="brand-mark" aria-hidden="true">▦</span><span>CSV Import <strong>Cleanroom</strong></span></a>
-      <nav aria-label="Primary navigation"><a href="#how">How it works</a><button class="text-button" data-action="license">${state.paid ? 'Cleanroom Plus' : 'Unlock Plus'}</button></nav>
+      <nav aria-label="Primary navigation"><a href="/demo/">Demo</a><a href="#how">How it works</a><a href="/privacy/">Privacy</a><button class="text-button" data-action="license">${state.paid ? 'Cleanroom Plus' : 'Unlock Plus'}</button></nav>
     </header>
     <div class="network-strip" role="status"><span class="lamp ${navigator.onLine ? 'on' : ''}" aria-hidden="true"></span><span id="network-copy">${navigator.onLine ? 'Local processing ready' : 'Offline · local processing ready'}</span><span>Files never leave this device</span></div>
+    ${state.demo ? `<aside class="demo-banner" aria-label="Demo controls"><strong>Demo — sample data, nothing is saved</strong><span>This bench uses separate local demo storage.</span><button class="secondary compact" data-action="reset-demo">Reset demo</button><button class="text-button" data-action="start-real">Start for real</button></aside>` : ''}
     <main id="main">
       <section class="hero" aria-labelledby="page-title">
         <div class="hero-copy">
           <p class="eyebrow">A preflight bench for strict imports</p>
-          <h1 id="page-title">Make the CSV fit.<br><em>Keep the original intact.</em></h1>
-          <p class="lede">Wire messy source columns to an exact template, inspect every rejected row, then keep the conversion as an auditable recipe.</p>
-          <div class="hero-actions"><button class="primary" data-action="sample">Try the calibration sample</button><a class="secondary button-link" href="#workspace">Open your files</a></div>
-          <ul class="assurances" aria-label="Product assurances"><li>100% on-device</li><li>Works offline</li><li>Formula-safe exports</li></ul>
+          <h1 id="page-title">Prepare CSV imports.<br><em>Keep the source intact.</em></h1>
+          <p class="lede">For operations staff and solo admins preparing strict SaaS imports from messy spreadsheets.</p>
+          <div class="hero-actions"><button class="primary" data-action="sample">Try it with sample data</button><a class="secondary button-link" href="#workspace">Open your files</a></div>
+          <p class="action-note">The sample opens a mapped import with one explained rejection.</p>
+          <ul class="assurances" aria-label="Product assurances"><li>Files stay on this device</li><li>Works offline after first visit</li><li>$19 once for unlimited recipes</li></ul>
         </div>
         <figure class="hero-visual"><picture><source media="(max-width: 600px)" srcset="/assets/calibration-bench-mobile.webp"><img src="/assets/calibration-bench.webp" width="1200" height="800" fetchpriority="high" alt="An illustrated mid-century calibration bench aligning stacks of punched data cards"></picture><figcaption>Source in. Exact template out.</figcaption></figure>
       </section>
@@ -60,7 +65,7 @@ function render(): void {
         <ol><li><span>01</span><strong>Load two files</strong><p>Your untouched source and the target service’s header template.</p></li><li><span>02</span><strong>Name every decision</strong><p>Map columns, choose explicit transforms, and add strict rules.</p></li><li><span>03</span><strong>Inspect before export</strong><p>Separate accepted rows from explained rejects and reuse the JSON recipe.</p></li></ol>
       </section>
     </main>
-    <footer><div><strong>CSV Import Cleanroom</strong><p>Independent local software by Sociobot.</p></div><nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><button class="text-button" data-action="license">${state.paid ? 'License active' : 'Cleanroom Plus · $19 once'}</button></nav><p class="provenance">Hero artwork generated for this product with factory-image.</p></footer>
+    <footer><div><strong>CSV Import Cleanroom</strong><p>Local CSV preparation for strict imports.</p></div><nav aria-label="Legal"><a href="/demo/">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><button class="text-button" data-action="license">${state.paid ? 'License active' : 'Cleanroom Plus · $19 once'}</button></nav><p class="provenance">Built by Param Factory · v1.0.4 · Hero artwork generated for this product with factory-image.</p></footer>
     ${state.showLicense ? licensePanel() : ''}
     <div id="toast" class="toast" hidden role="status"><span>An app update is ready.</span><button data-action="update">Update now</button></div>`;
   bindEvents();
@@ -97,10 +102,10 @@ function mappingView(): string {
     <th scope="row"><code>${esc(mapping.target)}</code>${mapping.required ? '<span class="required-mark">Required</span>' : ''}</th>
     <td><label class="sr-only" for="source-${index}">Source for ${esc(mapping.target)}</label><select id="source-${index}" data-map="source" data-index="${index}"><option value="">No source</option>${state.source!.headers.map(header => `<option ${header === mapping.source ? 'selected' : ''}>${esc(header)}</option>`).join('')}</select></td>
     <td><label class="sr-only" for="transform-${index}">Transform for ${esc(mapping.target)}</label><select id="transform-${index}" data-map="transform" data-index="${index}">${options(TRANSFORMS, mapping.transform)}</select>${mapping.transform !== 'copy' ? '<span class="review-tag">Review change</span>' : ''}</td>
-    <td><label class="sr-only" for="rule-${index}">Validation for ${esc(mapping.target)}</label><select id="rule-${index}" data-map="validation" data-index="${index}">${options(VALIDATIONS, mapping.validation)}</select><label class="check"><input type="checkbox" data-map="required" data-index="${index}" ${mapping.required ? 'checked' : ''}> Required</label></td>
+    <td><label class="sr-only" for="rule-${index}">Validation for ${esc(mapping.target)}</label><select id="rule-${index}" data-map="validation" data-index="${index}">${options(VALIDATIONS, mapping.validation)}</select><label class="check"><input type="checkbox" data-map="required" data-index="${index}" ${mapping.required ? 'checked' : ''}> <span>Required</span></label></td>
     <td><label class="sr-only" for="default-${index}">Default for ${esc(mapping.target)}</label><input id="default-${index}" data-map="defaultValue" data-index="${index}" value="${esc(mapping.defaultValue)}" placeholder="None"></td>
   </tr>`).join('');
-  return `<div class="mapping-toolbar"><div><strong>${state.target.headers.length} target fields</strong><span>${state.mappings.filter(item => item.source || item.defaultValue).length} connected</span></div><div><button class="secondary compact" data-action="import-recipe">Import recipe</button><input class="sr-only" id="recipe-file" type="file" accept="application/json,.json"><button class="secondary compact" data-action="export-recipe">Export current recipe</button></div></div>
+  return `<div class="mapping-toolbar"><div><strong>${state.target.headers.length} target fields</strong><span>${state.mappings.filter(item => item.source || item.defaultValue).length} connected</span></div><div><button class="secondary compact" data-action="import-recipe">Import recipe</button><label class="sr-only" for="recipe-file">Choose a recipe JSON file to import</label><input class="sr-only" id="recipe-file" type="file" accept="application/json,.json"><button class="secondary compact" data-action="export-recipe">Export current recipe</button></div></div>
   <div class="table-scroll mapping-scroll" tabindex="0" aria-label="Target mapping table"><table class="mapping-table"><thead><tr><th>Target field</th><th>Source column</th><th>Transform</th><th>Rule</th><th>Fallback</th></tr></thead><tbody>${rows}</tbody></table></div>
   <p class="mapping-note"><span class="review-tag">Review change</span> marks transforms that can alter formatting or precision. The inspect stage shows every changed value before export.</p>
   <div class="recipe-shelf"><div><h3>Saved recipes</h3><p>Recipes contain field names and rules—never spreadsheet rows.</p></div>${recipeShelf()}</div>
@@ -120,7 +125,7 @@ function inspectView(): string {
   ${result.formulaCount ? `<div class="alert safety"><strong>Formula shield active.</strong> ${result.formulaCount} ${result.formulaCount === 1 ? 'cell starts' : 'cells start'} like a spreadsheet formula. Export will prefix each with an apostrophe so opening the CSV cannot execute it.</div>` : ''}
   <div class="inspection-grid">
     <section aria-labelledby="preview-title"><div class="section-heading"><div><h3 id="preview-title">Output preview</h3><p>First ${sampleRows.length} rows · changed cells are marked.</p></div></div><div class="table-scroll" tabindex="0" aria-label="Output preview table"><table class="preview-table"><thead><tr><th>Source row</th>${state.target.headers.map(header => `<th>${esc(header)}</th>`).join('')}<th>Status</th></tr></thead><tbody>${sampleRows.map(row => `<tr class="${row.errors.length ? 'rejected' : ''}"><th>${row.sourceRow}</th>${row.values.map((value, index) => `<td class="${row.lossy.some(change => change.startsWith(state.target!.headers[index] + ':')) ? 'changed' : ''}"><span>${esc(value || '—')}</span></td>`).join('')}<td><span class="status-pill ${row.errors.length ? 'fail' : 'pass'}">${row.errors.length ? 'Rejected' : 'Accepted'}</span></td></tr>`).join('')}</tbody></table></div></section>
-    <aside class="diagnostics" aria-labelledby="diagnostics-title"><div class="section-heading"><div><h3 id="diagnostics-title">Rejected-row notes</h3><p>Reasons use the target field names.</p></div></div>${rejectionList(result)}</aside>
+    <section class="diagnostics" aria-labelledby="diagnostics-title"><div class="section-heading"><div><h3 id="diagnostics-title">Rejected-row notes</h3><p>Reasons use the target field names.</p></div></div>${rejectionList(result)}</section>
   </div>
   <details class="change-log" ${result.lossyCount ? '' : 'hidden'}><summary>Review ${result.lossyCount} changed ${result.lossyCount === 1 ? 'value' : 'values'}</summary><ul>${result.all.flatMap(row => row.lossy.map(change => `<li><strong>Row ${row.sourceRow}</strong> ${esc(change)}</li>`)).slice(0, 100).join('')}</ul>${result.lossyCount > 100 ? '<p>Showing the first 100 changes.</p>' : ''}</details>
   <div class="export-rack"><div><p class="eyebrow">Export rack</p><h3>${result.accepted.length ? 'Accepted rows are ready.' : 'Fix the rejected rows before exporting.'}</h3><p>The target CSV contains accepted rows only. The rejection report preserves row numbers and explanations.</p></div><div><button class="primary" data-action="export-target" ${!result.accepted.length ? 'disabled' : ''}>Export target CSV</button><button class="secondary" data-action="export-rejects" ${!result.rejected.length ? 'disabled' : ''}>Export rejection report</button><button class="secondary" data-action="export-recipe">Export recipe JSON</button></div></div>
@@ -169,7 +174,10 @@ async function loadFile(input: HTMLInputElement): Promise<void> {
 }
 
 async function action(name: string): Promise<void> {
-  if (name === 'sample') loadSample();
+  if (name === 'sample') {
+    if (state.demo) loadSample();
+    else location.assign('/demo/');
+  }
   else if (name === 'continue') { state.stage = 2; render(); scrollWorkspace(); }
   else if (name === 'run') inspect();
   else if (name === 'reset') await resetBench();
@@ -183,6 +191,8 @@ async function action(name: string): Promise<void> {
   else if (name === 'close-license') closeLicense();
   else if (name === 'restore-license') await restoreLicense();
   else if (name === 'update') location.reload();
+  else if (name === 'reset-demo') await resetDemo();
+  else if (name === 'start-real') await startForReal();
 }
 
 function loadSample(): void {
@@ -196,6 +206,17 @@ function loadSample(): void {
     { target: 'balance_usd', source: 'Balance', transform: 'currency', validation: 'number', required: false, defaultValue: '0' }
   ];
   state.stage = 2; state.result = null; state.error = ''; state.message = 'Sample loaded. Review its explicit wiring, then run inspection.'; void persist(); render(); scrollWorkspace();
+}
+
+async function resetDemo(): Promise<void> {
+  await clearWorkspace();
+  state.source = null; state.target = null; state.mappings = []; state.result = null; state.recipes = []; state.stage = 1;
+  loadSample();
+}
+
+async function startForReal(): Promise<void> {
+  await clearWorkspace();
+  location.assign('/');
 }
 
 function updateMapping(input: HTMLInputElement | HTMLSelectElement): void {
@@ -228,7 +249,10 @@ function exportRejects(): void { if (!state.result || !state.target) return; dow
 async function importRecipe(file?: File): Promise<void> {
   if (!file) return;
   try {
-    const recipe = validateRecipe(JSON.parse(await file.text()));
+    let parsed: unknown;
+    try { parsed = JSON.parse(await file.text()); }
+    catch { throw new Error('This recipe file is not valid JSON. Export a recipe from Cleanroom, then try that file.'); }
+    const recipe = validateRecipe(parsed);
     if (state.target && recipe.targetHeaders.join('\u0000') !== state.target.headers.join('\u0000')) throw new Error('This recipe does not match the loaded target headers or their order.');
     state.mappings = structuredClone(recipe.mappings); state.result = null; state.message = `Recipe “${recipe.name}” applied.`; await persist(); render();
   } catch (error) { fail(error); }
@@ -264,9 +288,15 @@ function scrollWorkspace(): void { document.querySelector('#workspace')?.scrollI
 async function initialise(): Promise<void> {
   captureLicense(); state.paid = hasOptimisticLicense(); render();
   try {
-    const [draft, recipes] = await Promise.all([loadDraft(), listRecipes()]);
-    if (draft) { state.source = draft.source; state.target = draft.target; state.mappings = draft.mappings; }
-    state.recipes = recipes; state.working = false; render();
+    if (state.demo) {
+      state.recipes = await listRecipes();
+      loadSample();
+    } else {
+      const [draft, recipes] = await Promise.all([loadDraft(), listRecipes()]);
+      if (draft) { state.source = draft.source; state.target = draft.target; state.mappings = draft.mappings; }
+      state.recipes = recipes;
+    }
+    state.working = false; render();
   } catch { state.working = false; state.error = 'Saved local work could not be opened. You can still start a new bench.'; render(); }
   if (localStorage.getItem('sb_license:csv-import-cleanroom')) {
     const verdict = await verifyLicense(); if (verdict.valid !== state.paid) { state.paid = verdict.valid; if (!verdict.valid) state.message = 'Your saved license is no longer active.'; render(); }

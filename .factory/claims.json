@@ -1,0 +1,51 @@
+[
+  {
+    "id": "demo-isolation",
+    "claim": "The sample demo uses separate storage and does not replace real local work.",
+    "where": "Demo banner, README",
+    "test": "npm run test:e2e -- --grep @claim:demo-isolation",
+    "sandbox": "Load real CSV files, enter /demo/, reload the sample, then return to the real workspace."
+  },
+  {
+    "id": "csv-export",
+    "claim": "Exports accepted sample rows as CSV.",
+    "where": "Export rack, README",
+    "test": "npm run test:e2e -- --grep @claim:csv-export",
+    "sandbox": "Run the shipped demo inspection and read the downloaded CSV."
+  },
+  {
+    "id": "formula-safe-export",
+    "claim": "Formula-like CSV values are neutralized in exports.",
+    "where": "Inspection safety notice, README",
+    "test": "npm run test:e2e -- --grep @claim:formula-safe-export",
+    "sandbox": "Run the shipped demo and read its downloaded accepted CSV."
+  },
+  {
+    "id": "offline-reload",
+    "claim": "Works offline after the first visit.",
+    "where": "Landing assurance, README",
+    "test": "npm run test:e2e -- --grep @claim:offline-reload",
+    "sandbox": "Visit /demo/, wait for the service worker, switch the browser offline, reload, and inspect the sample."
+  },
+  {
+    "id": "on-device-processing",
+    "claim": "Files stay on this device during the demo flow.",
+    "where": "Landing assurance, network strip, README",
+    "test": "npm run test:e2e -- --grep @claim:on-device-processing",
+    "sandbox": "Record every browser request while loading and inspecting /demo/; assert every request is same-origin."
+  },
+  {
+    "id": "plus-price",
+    "claim": "Cleanroom Plus is a $19 one-time license for unlimited on-device saved recipes.",
+    "where": "Landing assurance, license panel, README, Terms",
+    "test": "npm run test:e2e -- --grep @claim:plus-price",
+    "sandbox": "Open the license panel from a fresh browser context and assert the price and included feature."
+  },
+  {
+    "id": "file-limits",
+    "claim": "Each CSV is limited to 10 MB and 50,000 data rows.",
+    "where": "Load-stage limits, README, Terms",
+    "test": "npm test -- --testNamePattern @claim:file-limits",
+    "sandbox": "Construct files beyond both boundaries and assert the parser rejects them with the advertised limits."
+  }
+]

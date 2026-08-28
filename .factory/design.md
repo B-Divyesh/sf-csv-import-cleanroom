@@ -27,6 +27,8 @@ State changes use 180–240 ms opacity and 4 px vertical travel, with a single n
 
 One original hero still life, `public/assets/calibration-bench.webp`, supports the instrument-panel world and explains the product as a physical calibration path. It is decorative/contextual, not a capability claim. App icons are authored SVG geometry derived from a CSV grid and calibration dial, then rendered locally to PNG for the manifest.
 
+`public/assets/social-card.webp` is a 1200×630 center crop of the same original hero, exported locally for Open Graph and Twitter metadata. It adds no new visual claim or third-party asset.
+
 Art direction prompt sheet:
 
 > Use case: stylized-concept. Asset type: compact landing/product hero. Scene: a 1960s data calibration bench viewed slightly from above, with two small stacks of punched paper cards feeding through brass guide rollers into one pristine aligned stack, knobs, meter ticks, red and green indicator lamps. Style: tactile editorial still life, screen-printed gouache with subtle paper grain, precise simplified geometry. Composition: wide 3:2 crop, apparatus weighted to the right with quiet negative space at left, no people. Light: warm desk lamp, soft short shadows. Palette: drafting-paper cream, deep bottle green, oxidized brass, restrained vermilion. Materials: enamel metal, phenolic knobs, paper, brushed brass. Avoid: readable text, letters, numbers, brand marks, logos, watermarks, laptops, sci-fi neon, gradients, generic dashboard UI, distorted machinery.

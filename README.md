@@ -2,21 +2,20 @@
 
 CSV Import Cleanroom is an offline-first browser utility for operations staff who need to turn a messy CSV into a strict SaaS import template without editing the original file or writing a script.
 
-The product loads a source CSV and target header template, lets the operator explicitly map each field, applies named date/currency/ID transforms, validates every output row, explains rejects in target-column language, and exports both a safe target CSV and reusable JSON recipe. Spreadsheet content is processed and stored only in the browser.
+The product loads a source CSV and target header template, lets the operator explicitly map each field, applies named date/currency/ID transforms, validates every output row, explains rejects in target-column language, and exports an accepted-row CSV plus a reusable JSON recipe. Spreadsheet content is processed in the browser.
 
 Live product: <https://csv-import-cleanroom.sociobot.in>
 
 ## Capabilities
 
-- Local CSV parsing up to 10 MB and 50,000 data rows per file
-- Side-by-side target/source wiring with explicit fallbacks
-- Trim, ISO date, currency, integer, ID uppercase, and lowercase transforms
-- Required, email, ISO date, number, and whole-number validation
-- Accepted-only target CSV plus a rejected-row explanation report
-- CSV formula-injection protection at export
-- Portable JSON recipes and IndexedDB draft recovery
-- Installable PWA with an offline-cached app shell
-- Free workflow with one saved local recipe; $19 one-time Plus license for unlimited local recipe saves
+- A one-click [isolated sample demo](https://csv-import-cleanroom.sociobot.in/demo/)
+- Accepted-row CSV export from the sample inspection
+- Formula-like cells neutralized in every CSV export
+- Offline reload after the first visit
+- Local limits of 10 MB and 50,000 data rows per file
+- A $19 one-time Plus license for unlimited on-device saved recipes
+
+Every visitor-facing claim and its executable regression test is listed in [`.factory/claims.json`](.factory/claims.json). The demo sandbox is documented in [`.factory/demo.md`](.factory/demo.md).
 
 ## Develop and verify
 
@@ -39,14 +38,15 @@ Run verification with:
 
 ```sh
 npm test
+npm run lint
 npm run test:e2e
 ```
 
-The Playwright suite uses Chromium 1.58.2 and covers the sample conversion, export, serious/critical axe checks, and operation after `context.setOffline(true)`.
+The Playwright suite uses Chromium 1.58.2 and covers demo isolation, sample conversion/export, serious/critical axe checks in each workflow state, keyboard focus, a 390 px layout, and an offline reload.
 
 ## Privacy and billing
 
-No spreadsheet rows, recipes, analytics, fonts, or scripts are sent to third parties. License verification is the only background API request and runs at most daily when a license is present. Checkout and license verification use the Sociobot billing API; no payment provider is embedded. See [`/privacy`](https://csv-import-cleanroom.sociobot.in/privacy/) and [`/terms`](https://csv-import-cleanroom.sociobot.in/terms/).
+During normal and demo processing, spreadsheet rows remain in the browser. License verification is the only background API request and runs at most daily when a license is present. Checkout and license verification use the Sociobot billing API; no payment provider is embedded. See [`/privacy`](https://csv-import-cleanroom.sociobot.in/privacy/) and [`/terms`](https://csv-import-cleanroom.sociobot.in/terms/).
 
 ## Deployment
 

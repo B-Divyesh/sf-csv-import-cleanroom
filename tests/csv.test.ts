@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseCsv, safeCell, serializeCsv } from '../src/csv';
+import { guardFile, MAX_FILE_BYTES, MAX_ROWS, parseCsv, safeCell, serializeCsv } from '../src/csv';
 
 describe('CSV parser', () => {
   it('handles quoted commas, newlines, escaped quotes, and CRLF', () => {
@@ -18,5 +18,11 @@ describe('CSV parser', () => {
     for (const value of ['=1+1', '+cmd', '-10+20', '@SUM(A1)', '  =hidden']) expect(safeCell(value)).toBe(`'${value}`);
     expect(safeCell('-1240.50')).toBe('-1240.50');
     expect(serializeCsv(['value'], [['=1+1'], ['plain']])).toBe("value\r\n'=1+1\r\nplain");
+  });
+
+  it('@claim:file-limits enforces the advertised 10 MB and 50,000-row local limits', () => {
+    expect(() => guardFile(new File([new Uint8Array(MAX_FILE_BYTES + 1)], 'too-big.csv', { type: 'text/csv' }))).toThrow(/10 MB/);
+    const rows = Array.from({ length: MAX_ROWS + 1 }, () => 'value').join('\n');
+    expect(() => parseCsv(`name\n${rows}`)).toThrow(/50,000/);
   });
 });

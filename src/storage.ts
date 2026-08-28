@@ -1,7 +1,14 @@
 import type { CsvData, FieldMapping, Recipe } from './types';
 
 const DATABASE = 'csv-import-cleanroom';
+const DEMO_DATABASE = 'demo:csv-import-cleanroom';
 const VERSION = 1;
+let databaseName = DATABASE;
+
+/** Keep demonstration data in a database that normal work never reads. */
+export function useDemoStorage(enabled: boolean): void {
+  databaseName = enabled ? DEMO_DATABASE : DATABASE;
+}
 
 interface Draft {
   id: 'active';
@@ -13,7 +20,7 @@ interface Draft {
 
 function database(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DATABASE, VERSION);
+    const request = indexedDB.open(databaseName, VERSION);
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains('drafts')) db.createObjectStore('drafts', { keyPath: 'id' });
@@ -58,4 +65,15 @@ export function deleteRecipe(id: string): Promise<undefined> {
 
 export function listRecipes(): Promise<Recipe[]> {
   return transact<Recipe[]>('recipes', 'readonly', store => store.getAll());
+}
+
+/** Delete only the active storage namespace, used by Reset demo. */
+export function clearWorkspace(): Promise<void> {
+  const name = databaseName;
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.deleteDatabase(name);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+    request.onblocked = () => resolve();
+  });
 }

@@ -1,45 +1,44 @@
-# CSV Import Cleanroom — independent verification handoff
+# CSV Import Cleanroom — repair handoff
 
-## Result: FAIL
+## Repair scope
 
-- Candidate: `1e2e829d3ca58846f43db4176aec34f8acc0e399`
-- Live URL: <https://csv-import-cleanroom.sociobot.in>
-- Verified: 2026-08-28 UTC
-- Full report: [`.factory/verification-1.md`](verification-1.md)
+Repaired the independent-verifier blockers recorded for candidate `1e2e829d3ca58846f43db4176aec34f8acc0e399` in `.factory/verification-1.md`.
 
-Do not release this candidate. The deployed app byte-matches the candidate and its core CSV workflow works, but the acceptance contract has multiple release blockers:
+- Added `.factory/claims.json` with seven executable claim checks and exact `@claim:` coverage.
+- Rewrote the first screen to name operations staff and solo administrators, use **Try it with sample data**, explain the next state, and state privacy/offline/price facts.
+- Added a real `/demo/` entry. Demo work uses the separate `demo:csv-import-cleanroom` IndexedDB database; real drafts use `csv-import-cleanroom`. The persistent banner provides **Reset demo** and **Start for real**. Returning to real work deletes only demo storage and preserves the real draft.
+- Fixed the mapping accessibility defects: `#recipe-file` has a programmatic label, CSV picker labels show a designed focus ring through `:focus-within`, required-checkbox labels are at least 44 px, and the nested complementary landmark was replaced with a labelled section.
+- Replaced JSON parser jargon with a plain recovery instruction.
+- Fixed a discovered PWA root cause: `sw.js` contained TypeScript’s non-null syntax and could not register. The worker now parses, precaches the demo route with absolute cache keys, updates under `cleanroom-v1.0.4`, and exposes the existing update flow.
+- Added `/demo/`, designed `404.html`, `sitemap.xml`, canonical/Open Graph/Twitter/apple-touch metadata, a 1200×630 social-card crop derived from the provenanced hero, `staticwebapp.config.json`, response/security/cache policy, `.factory/demo.md`, and `.factory/copy-audit.md`.
 
-1. `.factory/claims.json` is missing, so there are no mandatory per-claim tests. This is an automatic failure.
-2. The cold first screen says what the tool does and what to click, but not whom it is for.
-3. The sample is not an isolated demo. It uses the normal IndexedDB namespace, persists after reload, has no demo banner/reset/start-for-real controls, and can overwrite a loaded real draft without confirmation.
-4. Live axe reports a critical unlabeled `#recipe-file` input in the mapping stage. CSV file inputs also have no visible keyboard focus, and checkbox targets are below 44 px.
+## Verification
 
-Important secondary gaps: no real 404, sitemap, canonical/social metadata, static host configuration, CSP/frame policy, immutable asset caching, `.factory/demo.md`, or `.factory/copy-audit.md`.
-
-## What passed
-
-- `npm ci`
-- `npm test`: 8/8
-- `npm run build`: passed with type-check; `dist/` produced
-- `npm run test:e2e`: 4/4
-- `npm audit --audit-level=high`: 0 vulnerabilities
-- Sample conversion/export/rejection report/formula neutralization/recipe JSON
-- Invalid file, size/row boundary, malformed recipe, no-mapping, persistence, and free-tier recovery checks
-- Desktop, 390 px, and 320 px functional layouts; reduced-motion behavior
-- No console/page errors in tested main, sample, inspection, legal, offline, or license states
-- Offline reload, offline conversion, cached legal route, manifest installability, and simulated service-worker update
-- Live Lighthouse mobile: 96 performance, 100 accessibility, 100 best practices, 100 SEO; LCP 1.3 s, CLS 0
-- Production checkout now returns 303 to hosted Dodo checkout; the prior registration concern is resolved
-- Billing verification rate limit: 30 HTTP 200 and 90 HTTP 429 responses in a 120-request burst; every 429 had `Retry-After` (0–4 s)
-
-## Reproduce
+Clean install and quality gates run on 2026-08-28 UTC:
 
 ```sh
 npm ci
-npm test
-npm run build
-npm run test:e2e
-npm audit --audit-level=high
+npm test                         # 9/9 passed
+npm test -- --testNamePattern @claim:file-limits  # 1/1 passed
+npm run lint                     # tsc --noEmit passed
+npm run build                    # dist/ produced
+npm run test:e2e                 # 11/11 passed
+npm run test:e2e -- --grep @claim:  # 6/6 passed
+npm audit --audit-level=high     # 0 vulnerabilities
 ```
 
-The repository has no lint script. See the full report for exact functional, privacy, accessibility, response-policy, caching, bundle, and deployment-identity evidence.
+Browser evidence from Playwright 1.58.2 covers desktop, 390 px mobile, keyboard-visible picker focus, focus target size, mapping and inspection state axe scans, demo isolation, CSV export, formula neutralization, same-origin demo requests, service-worker cache contents, offline demo processing, route metadata, and designed 404 configuration.
+
+`/opt/fleet/lib/verify-url.sh` passed against the built local preview for `/` and `/demo/`: both returned HTTP 200 with no console errors, `lang=en`, one `h1`, a main landmark, and no missing image alt text. The Playwright axe integration reported no serious or critical violations on `/`, `/demo/`, `/privacy/`, `/terms/`, mapping, or inspection. `npx @axe-core/cli` was attempted but its Selenium launcher could not locate a Chrome binary in this container; the project’s pinned Playwright Chromium axe tests are the recorded accessibility evidence.
+
+Build output remains within static budgets: main JS 31.67 KB raw / 11.22 KB gzip; main CSS 17.98 KB raw / 4.88 KB gzip; mobile hero 53.7 KB; social card 86.6 KB. `dist/staticwebapp.config.json` supplies immutable caching for `/assets/*`, a manifest MIME type, CSP, frame policy, permissions policy, and the production 404 override.
+
+## Run and deploy
+
+Use `npm run dev` for local work. Deploy the generated `dist/` directory as the static app; it contains `index.html` at its root and `staticwebapp.config.json`. The repository’s configured `main` push is the handoff point for the factory static deployment; no DNS, billing, or other infrastructure was changed.
+
+## Known limits
+
+- CSV only; the explicit local cap remains 10 MB and 50,000 data rows per file.
+- The local Vite preview does not apply Azure Static Web Apps response overrides, so the automated route test validates `staticwebapp.config.json` plus the rendered `404.html`; the production static host applies the 404 status/header policy.
+- The product intentionally has no cloud sync. Recipe JSON export/import remains the portability path.
