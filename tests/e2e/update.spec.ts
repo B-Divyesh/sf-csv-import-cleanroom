@@ -15,7 +15,8 @@ test('activates a waiting service-worker update from the in-app notice', async (
   });
 
   try {
-    await writeFile(workerPath, original.replace(/cleanroom-v[\d.]+/, `cleanroom-update-${Date.now()}`));
+    const updateVersion = `cleanroom-update-${Date.now()}`;
+    await writeFile(workerPath, original.replace(/cleanroom-v[\d.]+/, updateVersion));
     await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration())?.update(); });
     await page.waitForFunction(async () => {
       const registration = await navigator.serviceWorker.getRegistration();
@@ -31,7 +32,14 @@ test('activates a waiting service-worker update from the in-app notice', async (
     const navigation = page.waitForNavigation({ waitUntil: 'domcontentloaded' });
     await notice.getByRole('button', { name: 'Update now' }).click();
     await Promise.all([navigation, controllerChange]);
-    await page.waitForFunction(async () => (await caches.keys()).some(key => key.includes('cleanroom-update-')));
+    await page.waitForFunction(async version => {
+      const registration = await navigator.serviceWorker.getRegistration();
+      return navigator.serviceWorker.controller?.scriptURL.includes(version) && registration?.active?.scriptURL.includes(version) && (await caches.keys()).some(key => key.includes(version));
+    }, updateVersion);
+    // The controller-change handler deliberately reloads immediately. Reload once
+    // more only after the replacement controller and its shell cache are proven,
+    // so this test also verifies a cold shell under the new worker.
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Prepare CSV imports.');
   } finally {
     await writeFile(workerPath, await readFile(join(fixture, 'sw.original.js'), 'utf8'));

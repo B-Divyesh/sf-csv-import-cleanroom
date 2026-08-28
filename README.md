@@ -10,6 +10,7 @@ Live product: <https://csv-import-cleanroom.sociobot.in>
 
 - A one-click [isolated sample demo](https://csv-import-cleanroom.sociobot.in/demo/)
 - Free accepted-row CSV and reusable recipe JSON exports
+- Free rejection-report exports and one saved local recipe
 - Formula-like cells neutralized in every CSV export
 - Offline reload after the first visit
 - Local limits of 10 MB and 50,000 data rows per file

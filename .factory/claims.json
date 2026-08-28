@@ -75,5 +75,12 @@
     "where": "README, license panel, Terms",
     "test": "npm run test:e2e -- --grep @claim:billing-route",
     "sandbox": "Open the license panel from a fresh demo context, inspect the checkout destination and loaded document, and assert no payment iframe, provider script, or provider request exists before a visitor selects checkout."
+  },
+  {
+    "id": "free-tier-entitlements",
+    "claim": "The free workspace exports rejection reports and saves one local recipe; Plus is required for another saved recipe.",
+    "where": "Cleanroom Plus section, saved recipes, Terms",
+    "test": "npm run test:e2e -- --grep @claim:free-tier-entitlements",
+    "sandbox": "In a fresh demo, run inspection, download the rejection report, save one recipe, then attempt a second save and assert the Plus panel opens."
   }
 ]

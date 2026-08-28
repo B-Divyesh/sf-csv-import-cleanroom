@@ -167,6 +167,24 @@ test('@claim:billing-route uses Sociobot checkout without embedded payment provi
   expect(requests.some(url => /stripe|paypal|dodo/i.test(url))).toBe(false);
 });
 
+test('@claim:free-tier-entitlements exports rejection reports and saves one recipe before Plus', async ({ page }) => {
+  await openDemo(page);
+  await page.getByRole('button', { name: /Run inspection/ }).click();
+  const rejectionDownload = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export rejection report' }).click();
+  const reportPath = await (await rejectionDownload).path();
+  const report = await readFile(reportPath!, 'utf8');
+  expect(report).toContain('source_row,reasons,external_id,name,email,started_on,balance_usd');
+  expect(report).toContain('email is not a valid email address');
+  await page.getByRole('button', { name: 'Adjust wiring' }).click();
+  page.once('dialog', dialog => dialog.accept('First local recipe'));
+  await page.getByRole('button', { name: /Save this recipe/ }).click();
+  await expect(page.getByRole('button', { name: 'First local recipe', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: /Save this recipe.*Plus/ }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.getByText('The free workspace saves one recipe locally. JSON export always stays free.')).toBeVisible();
+});
+
 test.describe('license verification fail-closed policy', () => {
   test('checkout-return token is stripped and unlocks only after online verification', async ({ page }) => {
     await page.route(VERIFY_URL, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ valid: true, reason: 'ok' }) }));
@@ -266,6 +284,7 @@ test('has no serious or critical accessibility violations in every workflow stat
   await openDemo(page);
   const mapping = await new AxeBuilder({ page }).analyze();
   expect(mapping.violations.filter(item => ['serious', 'critical'].includes(item.impact ?? '')), 'mapping').toEqual([]);
+  expect(mapping.violations.filter(item => item.id === 'heading-order'), 'demo mapping heading outline').toEqual([]);
   await page.getByRole('button', { name: /Run inspection/ }).click();
   const inspection = await new AxeBuilder({ page }).analyze();
   expect(inspection.violations.filter(item => ['serious', 'critical'].includes(item.impact ?? '')), 'inspection').toEqual([]);
@@ -347,6 +366,19 @@ test('opens the mapped demo workspace in the first viewport and keeps stage focu
   await expect(page.getByText('Inspection complete: 2 accepted, 1 rejected.')).toBeVisible();
 });
 
+test('keeps the demo identity and controls in the settled mobile workspace viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/demo/');
+  await expect(page.locator('#workspace-title')).toBeFocused();
+  for (const control of [
+    page.getByText('Demo — sample data, nothing is saved'),
+    page.getByRole('button', { name: 'Reset demo' }),
+    page.getByRole('button', { name: 'Start for real' })
+  ]) {
+    await expect(control).toBeInViewport();
+  }
+});
+
 test('moves focus to headings for route and in-page navigation', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('link', { name: 'How it works' }).click();
@@ -355,6 +387,19 @@ test('moves focus to headings for route and in-page navigation', async ({ page }
   await expect.poll(() => page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
   await page.getByLabel('Primary navigation').getByRole('link', { name: 'Privacy' }).click();
   await expect(page.getByRole('heading', { name: 'How your CSV data is handled' })).toBeFocused();
+});
+
+test('restores the Home document, title, focus, and announcement with browser Back', async ({ page }) => {
+  for (const destination of ['Demo', 'Privacy'] as const) {
+    await page.goto('/');
+    await page.getByLabel('Primary navigation').getByRole('link', { name: destination }).click();
+    await page.goBack();
+    await expect(page).toHaveURL('http://127.0.0.1:4173/');
+    await expect(page).toHaveTitle('CSV Import Cleanroom — Prepare CSV imports');
+    await expect(page.locator('#page-title')).toHaveText('Prepare CSV imports.');
+    await expect(page.locator('#page-title')).toBeFocused();
+    await expect(page.locator('.route-announcer')).toHaveText('Home page loaded.');
+  }
 });
 
 test('keeps the 390px workflow usable without page-level sideways scrolling', async ({ page }) => {

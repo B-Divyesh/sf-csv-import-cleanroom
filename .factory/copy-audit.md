@@ -13,6 +13,10 @@
 | Process CSV files on this device | 6 | Pass |
 | Review the exported CSV before importing it into your target service. | 11 | Pass |
 | Save unlimited recipes for $19 once | 7 | Pass |
+| No subscription. | 2 | Pass |
+| CSV export, recipe export, rejection reports, and safety checks stay free. | 11 | Pass; `free-tier-entitlements` plus export/safety claims |
+| Save one recipe and export every result. | 7 | Pass; `free-tier-entitlements` |
+| Unlimited saved recipes on this device. | 6 | Pass; `plus-price` |
 
 All current landing sentences are 22 words or fewer and contain no banned language.
 
@@ -29,6 +33,8 @@ No landing sentence exceeds 22 words or uses a banned term.
 | License verification is unavailable. | 4 | Pass |
 | Connect to the internet and try again. | 7 | Pass |
 | The free workflow is still available. | 6 | Pass |
+| The free workspace saves one recipe locally. | 8 | Pass; `free-tier-entitlements` |
+| JSON export always stays free. | 6 | Pass; `csv-export` |
 | That license is not active. | 5 | Pass |
 | Check the token or buy a new license. | 8 | Pass |
 

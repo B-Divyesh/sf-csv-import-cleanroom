@@ -37,12 +37,13 @@ function render(): void {
       <nav aria-label="Primary navigation"><a href="/demo/">Demo</a><a href="#how">How it works</a><a href="/privacy/">Privacy</a><button class="text-button" data-action="license">${state.paid ? 'Cleanroom Plus' : 'Unlock Plus'}</button></nav>
     </header>
     <div class="network-strip" role="status"><span class="lamp ${navigator.onLine ? 'on' : ''}" aria-hidden="true"></span><span id="network-copy">${navigator.onLine ? 'Local processing ready' : 'Offline · local processing ready'}</span><span>Files never leave this device</span></div>
-    ${state.demo ? `<aside class="demo-banner" aria-label="Demo controls"><strong>Demo — sample data, nothing is saved</strong><span>This demo uses separate local storage.</span><button class="secondary compact" data-action="reset-demo">Reset demo</button><button class="text-button" data-action="start-real">Start for real</button></aside>` : ''}
+    ${state.demo ? `<aside class="demo-banner" aria-label="Demo controls"><strong>Demo — sample data, nothing is saved</strong><span>This demo uses separate local storage.</span><div class="demo-actions"><button class="secondary compact" data-action="reset-demo">Reset demo</button><button class="text-button" data-action="start-real">Start for real</button></div></aside>` : ''}
+    <div class="route-announcer" aria-live="polite">${state.demo ? 'Demo page loaded.' : 'Home page loaded.'}</div>
     <main id="main">
       ${state.demo ? '' : `<section class="hero" aria-labelledby="page-title">
         <div class="hero-copy">
           <p class="eyebrow">Map, validate, and export CSV rows</p>
-          <h1 id="page-title">Prepare CSV imports.</h1>
+          <h1 id="page-title" tabindex="-1">Prepare CSV imports.</h1>
           <p class="lede">For operations staff and solo admins preparing a target template from messy spreadsheets.</p>
           <div class="hero-actions"><button class="primary" data-action="sample">Try it with sample data</button><a class="secondary button-link" href="#workspace">Open your files</a></div>
           <p class="action-note">The sample opens a mapped import with one explained rejection.</p>
@@ -66,9 +67,9 @@ function render(): void {
         <ol><li><span>01</span><strong>Load two files</strong><p>Load a source CSV and define the target template CSV once.</p></li><li><span>02</span><strong>Map target fields</strong><p>Map columns, choose explicit transforms, and add strict rules.</p></li><li><span>03</span><strong>Inspect before export</strong><p>Separate accepted rows from explained rejects and reuse the JSON recipe.</p></li></ol>
       </section>
       <section class="privacy-facts" aria-labelledby="privacy-title"><div><p class="eyebrow">Privacy and limits</p><h2 id="privacy-title">Process CSV files on this device</h2></div><div><p>Spreadsheet rows stay in your browser during normal and demo processing.</p><p>Review the exported CSV before importing it into your target service.</p><a href="/privacy/">Read the privacy policy</a></div></section>
-      <section class="plus-section" aria-labelledby="plus-title"><div><p class="eyebrow">Cleanroom Plus</p><h2 id="plus-title">Save unlimited recipes for $19 once</h2><p>No subscription. CSV export, recipe export, rejection reports, and safety checks stay free.</p></div><div class="tier-list"><p><strong>Free</strong><br>One saved recipe and all exports.</p><p><strong>Plus · $19 once</strong><br>Unlimited saved recipes on this device.</p><button class="primary" data-action="license">View Cleanroom Plus — $19 once</button></div></section>`}
+      <section class="plus-section" aria-labelledby="plus-title"><div><p class="eyebrow">Cleanroom Plus</p><h2 id="plus-title">Save unlimited recipes for $19 once</h2><p>No subscription. CSV export, recipe export, rejection reports, and safety checks stay free.</p></div><div class="tier-list"><p><strong>Free</strong><br>Save one recipe and export every result.</p><p><strong>Plus · $19 once</strong><br>Unlimited saved recipes on this device.</p><button class="primary" data-action="license">View Cleanroom Plus — $19 once</button></div></section>`}
     </main>
-    <footer><div><strong>CSV Import Cleanroom</strong><p>Local CSV preparation for strict imports.</p></div><nav aria-label="Legal"><a href="/demo/">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><button class="text-button" data-action="license">${state.paid ? 'License active' : 'View Cleanroom Plus — $19 once'}</button></nav><p class="provenance">Built by Param Factory · v1.0.6 · Hero artwork generated for this product with factory-image.</p></footer>
+    <footer><div><strong>CSV Import Cleanroom</strong><p>Local CSV preparation for strict imports.</p></div><nav aria-label="Legal"><a href="/demo/">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><button class="text-button" data-action="license">${state.paid ? 'License active' : 'View Cleanroom Plus — $19 once'}</button></nav><p class="provenance">Built by Param Factory · v1.0.7 · Hero artwork generated for this product with factory-image.</p></footer>
     ${state.showLicense ? licensePanel() : ''}
     <div id="toast" class="toast" hidden role="status"><span>An app update is ready.</span><button data-action="update">Update now</button></div>`;
   bindEvents();
@@ -112,7 +113,7 @@ function mappingView(): string {
   return `<div class="mapping-toolbar"><div><strong>${state.target.headers.length} target fields</strong><span>${state.mappings.filter(item => item.source || item.defaultValue).length} connected</span></div><div><button class="secondary compact" data-action="import-recipe">Import recipe</button><label class="sr-only" for="recipe-file">Choose a recipe JSON file to import</label><input class="sr-only" id="recipe-file" type="file" accept="application/json,.json"><button class="secondary compact" data-action="export-recipe">Export current recipe</button></div></div>
   <div class="table-scroll mapping-scroll" tabindex="0" aria-label="Target mapping table"><table class="mapping-table"><thead><tr><th>Target field</th><th>Source column</th><th>Transform</th><th>Rule</th><th>Fallback</th></tr></thead><tbody>${rows}</tbody></table></div>
   <p class="mapping-note"><span class="review-tag">Review change</span> marks transforms that can alter formatting or precision. The inspect stage shows every changed value before export.</p>
-  <div class="recipe-shelf"><div><h3>Saved recipes</h3><p>Recipes contain field names and rules—never spreadsheet rows.</p></div>${recipeShelf()}</div>
+  <div class="recipe-shelf"><div>${state.demo ? '<h2>Saved recipes</h2>' : '<h3>Saved recipes</h3>'}<p>Recipes contain field names and rules—never spreadsheet rows.</p></div>${recipeShelf()}</div>
   <div class="stage-actions"><button class="secondary" data-stage="1">Back to files</button><button class="primary" data-action="run">Run inspection <span aria-hidden="true">→</span></button></div>`;
 }
 
@@ -155,13 +156,6 @@ function bindEvents(): void {
     history.pushState({ section: 'how' }, '', '#how');
     document.querySelector<HTMLElement>('#how-title')?.focus();
   });
-  app.querySelectorAll<HTMLAnchorElement>('a[href="/demo/"], a[href="/privacy/"], a[href="/terms/"]').forEach(link => link.addEventListener('click', event => {
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return;
-    event.preventDefault();
-    const destination = link.getAttribute('href')!;
-    history.pushState({ route: destination }, '', destination);
-    location.replace(destination);
-  }));
   app.querySelectorAll<HTMLInputElement>('[data-file]').forEach(input => input.addEventListener('change', () => void loadFile(input)));
   app.querySelectorAll<HTMLElement>('[data-action]').forEach(element => element.addEventListener('click', () => void action(element.dataset.action ?? '')));
   app.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-map]').forEach(input => input.addEventListener('change', () => updateMapping(input)));
@@ -328,6 +322,7 @@ async function initialise(): Promise<void> {
     if (verdict.valid !== state.paid || !verdict.valid) { state.paid = verdict.valid; if (!verdict.valid) state.message = verdict.reason === 'unavailable' ? licenseFailureMessage(verdict.reason) : 'Your saved license is no longer active.'; render(); }
   }
   registerServiceWorker();
+  focusRouteDestination();
 }
 
 function registerServiceWorker(): void {
