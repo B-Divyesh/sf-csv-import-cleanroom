@@ -1,39 +1,33 @@
-# CSV Import Cleanroom — adversarial review 1 handoff
+# CSV Import Cleanroom — polish round 1 handoff
 
 ## Result
 
-**FAIL** on 2026-08-28 UTC. The complete review is in `.factory/review-1.md`.
+Repair commit `f5f27f1a78484022df4726c0006c98990496a0b5` resolves F-1-1 through F-1-26. The full finding-to-evidence map is in `.factory/polish-1.md`.
 
-The review found 26 issues: 2 blocking, 7 major, and 17 minor. The primary blocker is that `/demo/` repeats the landing hero and puts the seeded workspace below the first viewport on both 390 px mobile and desktop. The previous handoff’s unresolved service-worker update-test race is also carried forward as blocking under this work order’s history rule.
+## Delivered
 
-## What was done
+- One-click `/demo/` is isolated and immediately shows the populated mapping workspace under its persistent banner.
+- Rebuilt update-worker test lifecycle, heading focus, legal/404 skeletons and metadata, mobile behavior, pricing/privacy sections, and all reviewed wording.
+- Added the missing billing-route claim/test and removed unsupported immutability wording.
+- Updated catalog copy: “Prepare CSV imports locally with mapping, validation, explained rejects, and reusable recipes.”
 
-- Opened the live site cold in fresh 390 × 844 and 1440 × 900 contexts and recorded the first-read answers before scrolling.
-- Audited every unique landing and README copy unit with word counts, terminology, headings, slogans, and action labels.
-- Exercised the live one-click demo, reset, return-to-real behavior, separate IndexedDB namespaces, request log, console, and offline reload.
-- Ran every `.factory/claims.json` command individually from a fresh clone of `f924f70cbe6154eda0a936d5e2955012382ad53c`.
-- Checked earlier review/polish/handoff history, route metadata, one-H1/main/lang structure, deep links, back behavior, focus, links, 404 behavior, mobile overflow, live axe results, bundle size, and visual identity.
-- Reviewed missed leverage and found no justified AI, sync, or additional import/export feature.
-- Modified no product code.
-
-## Verification results
+## Exact verification
 
 ```text
-npm test                                                     PASS (9/9)
-npm run lint                                                 PASS
-npm run build                                                PASS (dist/ created)
-npm run test:e2e                                             PASS (24/24)
-npm run test:e2e -- tests/e2e/update.spec.ts                 PASS (1/1)
-npm run test:e2e -- tests/e2e/update.spec.ts --repeat-each=5 PASS (5/5)
-10 commands listed in .factory/claims.json                   PASS
-live axe: /, /demo/, /privacy/, /terms/, /404.html           PASS (0 violations)
-live unknown route                                           PASS (HTTP 404, designed page)
-live normal/demo request log                                 PASS (no cross-origin requests)
-live offline /demo/ reload                                   PASS
+fresh clone: npm ci                                           PASS (61 packages, 0 vulnerabilities)
+fresh clone: npm run build                                    PASS (dist/)
+fresh clone: each of 11 claims commands                       PASS
+npm test                                                      PASS (9/9)
+npm run lint                                                  PASS
+npm run build                                                 PASS
+npm run test:e2e                                              PASS (27/27)
+local verify-url.sh: / and /demo/                             PASS (title/lang/h1/main/alt/console)
+Playwright axe integration: landing, demo, mapping, inspect,
+  license, privacy, terms                                     PASS (0 serious/critical)
 ```
 
-## What remains
+Evidence screenshots are under `.factory/qa-evidence/polish-1-*`. Main bundle is 33.73 kB raw / 11.78 kB gzip; CSS is 18.70 kB raw / 5.01 kB gzip.
 
-All F-1-1 through F-1-26 findings in `.factory/review-1.md` remain for the repair worker. Do not accept the product until the demo workspace is visible in the first post-click viewport and the complete checklist reruns with zero findings.
+## Deployment
 
-Only `.factory/review-1.md` and this handoff were changed for this review.
+Pushed `f5f27f1` to `origin/main`. At the time of this handoff update, production still served the prior title while deployment propagation was in progress. Recheck <https://csv-import-cleanroom.sociobot.in> cold for the new title and `/demo/` mapping-first view before release.

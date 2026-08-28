@@ -2,13 +2,19 @@
 
 | Copy | Words | Result |
 | --- | ---: | --- |
-| Prepare CSV imports. Keep the source intact. | 7 | Pass |
-| For operations staff and solo admins preparing strict SaaS imports from messy spreadsheets. | 12 | Pass |
+| Prepare CSV imports. | 3 | Pass |
+| For operations staff and solo admins preparing a target template from messy spreadsheets. | 12 | Pass |
 | Try it with sample data | 5 | Pass |
 | The sample opens a mapped import with one explained rejection. | 10 | Pass |
 | Files stay on this device | 6 | Pass |
 | Works offline after first visit | 5 | Pass |
 | $19 once for unlimited recipes | 5 | Pass |
+| Accepted rows follow your target template. | 6 | Pass |
+| Process CSV files on this device | 6 | Pass |
+| Review the exported CSV before importing it into your target service. | 11 | Pass |
+| Save unlimited recipes for $19 once | 7 | Pass |
+
+All current landing sentences are 22 words or fewer and contain no banned language.
 
 No landing sentence exceeds 22 words or uses a banned term.
 
