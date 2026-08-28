@@ -5,7 +5,7 @@ Repair commits: `f5f27f1a78484022df4726c0006c98990496a0b5` and `34f36f8857b06dbb
 | Finding | Change made | Evidence |
 | --- | --- | --- |
 | F-1-1 | Demo omits the landing hero and opens on the seeded Map workspace. | `opens the mapped demo workspace…`; `.factory/qa-evidence/polish-1-demo-mobile.png` |
-| F-1-2 | Update test now isolates its worker fixture, waits for `installed`/`waiting`, activates it, and asserts the new cache. | `activates a waiting service-worker update…` |
+| F-1-2 | Update test now isolates its worker fixture, waits for `installed`/`waiting`, reloads to observe that state, activates it, and asserts the new cache. | `activates a waiting service-worker update… --repeat-each=3` |
 | F-1-3 | In-page routing uses History API with heading focus; legal pages focus and announce their route. | `moves focus to headings…` |
 | F-1-4 | Stage changes move focus to the workspace heading. | `opens the mapped demo workspace…` |
 | F-1-5 | Legal and 404 pages now use the complete navigation/footer skeleton. | `serves product routes…` |

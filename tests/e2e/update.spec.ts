@@ -21,6 +21,10 @@ test('activates a waiting service-worker update from the in-app notice', async (
       const registration = await navigator.serviceWorker.getRegistration();
       return registration?.waiting?.state === 'installed';
     });
+    // Reload under the current controller so registration.waiting is observed on
+    // app startup as well as through updatefound. This removes timing dependence
+    // on a single installing-state event.
+    await page.reload({ waitUntil: 'domcontentloaded' });
     const notice = page.getByRole('status').filter({ hasText: 'An app update is ready.' });
     await expect(notice).toBeVisible();
     const controllerChange = page.waitForEvent('framenavigated');

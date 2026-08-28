@@ -21,6 +21,7 @@ npm test                                                      PASS (9/9)
 npm run lint                                                  PASS
 npm run build                                                 PASS
 npm run test:e2e                                              PASS (27/27)
+update-worker test --repeat-each=3                            PASS (3/3)
 local verify-url.sh: / and /demo/                             PASS (title/lang/h1/main/alt/console)
 Playwright axe integration: landing, demo, mapping, inspect,
   license, privacy, terms                                     PASS (0 serious/critical)
