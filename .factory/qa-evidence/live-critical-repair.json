@@ -1,0 +1,18 @@
+{
+  "offlineReload": {
+    "passed": true,
+    "mobile": {
+      "viewport": 390,
+      "pageScrollX": 0,
+      "tableScrollable": true
+    },
+    "errors": [],
+    "thirdParty": []
+  },
+  "offlineFirstLicense": {
+    "dialog": true,
+    "unlockButton": true,
+    "message": true,
+    "verdict": null
+  }
+}
