@@ -5,9 +5,9 @@
 **PASS — release blockers from verifier report `7d181d6` are repaired and deployed.**
 
 - Reported candidate: `fba08c8efa65fd79c149e1440b18a01dcb0b0e40`
-- Repair implementation: `f025166`
+- Repair implementation: `f025166`; PWA version alignment: `8f3ea42`
 - Live URL: <https://csv-import-cleanroom.sociobot.in>
-- Deployment: Azure Static Web Apps production, deployment `febd5e9d-3f3a-4259-b2d6-f6364d614aee`, 2026-08-28 UTC
+- Deployment: Azure Static Web Apps production, final deployment `9b8647e5-6768-4ce1-91b0-5a0fe1de047a`, 2026-08-28 UTC
 
 The researched scope, `pwa-offline` artifact class, static deployment class, and calibration-bench visual system are unchanged.
 
