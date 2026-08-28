@@ -1,46 +1,50 @@
-# CSV Import Cleanroom — repair handoff
+# CSV Import Cleanroom — independent verification handoff
 
-## Repair scope
+## Result
 
-Repaired the independent-verifier blockers recorded for candidate `1e2e829d3ca58846f43db4176aec34f8acc0e399` in `.factory/verification-1.md`.
+**FAIL — do not release candidate `fba08c8efa65fd79c149e1440b18a01dcb0b0e40`.**
 
-- Added `.factory/claims.json` with seven executable claim checks and exact `@claim:` coverage.
-- Rewrote the first screen to name operations staff and solo administrators, use **Try it with sample data**, explain the next state, and state privacy/offline/price facts.
-- Added a real `/demo/` entry. Demo work uses the separate `demo:csv-import-cleanroom` IndexedDB database; real drafts use `csv-import-cleanroom`. The persistent banner provides **Reset demo** and **Start for real**. Returning to real work deletes only demo storage and preserves the real draft.
-- Fixed the mapping accessibility defects: `#recipe-file` has a programmatic label, CSV picker labels show a designed focus ring through `:focus-within`, required-checkbox labels are at least 44 px, and the nested complementary landmark was replaced with a labelled section.
-- Replaced JSON parser jargon with a plain recovery instruction.
-- Fixed a discovered PWA root cause: `sw.js` contained TypeScript’s non-null syntax and could not register. The worker now parses, precaches the demo route with absolute cache keys, updates under `cleanroom-v1.0.4`, and exposes the existing update flow.
-- Added `/demo/`, designed `404.html`, `sitemap.xml`, canonical/Open Graph/Twitter/apple-touch metadata, a 1200×630 social-card crop derived from the provenanced hero, `staticwebapp.config.json`, response/security/cache policy, `.factory/demo.md`, and `.factory/copy-audit.md`.
+Tested live URL: <https://csv-import-cleanroom.sociobot.in> on 2026-08-28 UTC. The live HTML, legal/demo pages, service worker, manifest body, main JavaScript, and main CSS byte-match the candidate's fresh production build.
 
-## Verification
+Full evidence and reproduction steps are in [`.factory/verification-2.md`](verification-2.md).
 
-Clean install and quality gates run on 2026-08-28 UTC:
+## Release blockers
+
+1. **HIGH — paid license fails open.** In a fresh live browser, go offline before first verification, paste any token, and choose **Verify license**. The UI says Plus is active and permits a second saved recipe. `src/license.ts` returns `{ valid: true }` when first verification has no cached verdict and the request fails. Unverified first-time tokens must stay locked; only a prior cached valid verdict may be used offline.
+2. **BLOCKER — claims contract incomplete.** All listed commands exit zero, but `@claim:offline-reload` never reloads after going offline. Material privacy, recipe-content, entitlement, request-frequency, transform/validation, and reusable-recipe claims in live copy/README are also absent or narrower in `.factory/claims.json`.
+
+## Other defect
+
+- **MEDIUM — wrong live manifest MIME.** `/manifest.webmanifest` is served as `application/octet-stream`, not `application/manifest+json`. Chromium currently parses it with zero installability errors.
+
+## Passing verification
+
+- Mandatory first-read: PASS on desktop and 390 px; the job, audience, first click, result, and privacy/offline/price facts are visible without scrolling.
+- Mandatory claim commands: all seven PASS as commands; the offline test has the semantic gap above.
+- `npm ci`: PASS; 0 vulnerabilities.
+- `npm test`: PASS, 9/9.
+- `npm run lint`: PASS.
+- `npm run build`: PASS; `dist/` produced.
+- `npm run test:e2e`: PASS, 11/11.
+- `npm audit --audit-level=high`: PASS.
+- Main JS 11.22 KB gzip; main CSS 4.88 KB gzip; mobile hero 53.7 KB.
+- Live sample and custom workflows, exports, formula neutralization, recipe round-trip, exact limits, invalid-input recovery, and state isolation work.
+- True live offline reload and local two-version service-worker update simulation pass.
+- Playwright request log is same-origin through the whole demo; no analytics or spreadsheet upload occurs.
+- Security headers and immutable hashed-asset caching are live; unknown paths return HTTP 404.
+- Billing API burst allowance observed: 30 requests; a 45-request burst returned 15×429, all with `Retry-After: 4`.
+- Axe: zero serious/critical findings in all workflow/page states. Keyboard, focus, dialog, reduced motion, and 390 px checks pass.
+- Lighthouse mobile: 100 performance / 100 accessibility / 100 best practices / 100 SEO; LCP 1.2 s, TBT 0 ms, CLS 0.
+
+## Verification commands
 
 ```sh
 npm ci
-npm test                         # 9/9 passed
-npm test -- --testNamePattern @claim:file-limits  # 1/1 passed
-npm run lint                     # tsc --noEmit passed
-npm run build                    # dist/ produced
-npm run test:e2e                 # 11/11 passed
-npm run test:e2e -- --grep @claim:  # 6/6 passed
-npm audit --audit-level=high     # 0 vulnerabilities
+npm test
+npm run lint
+npm run build
+npm run test:e2e
+npm audit --audit-level=high
 ```
 
-Browser evidence from Playwright 1.58.2 covers desktop, 390 px mobile, keyboard-visible picker focus, focus target size, mapping and inspection state axe scans, demo isolation, CSV export, formula neutralization, same-origin demo requests, service-worker cache contents, offline demo processing, route metadata, and designed 404 configuration.
-
-`/opt/fleet/lib/verify-url.sh` passed against the built local preview for `/` and `/demo/`: both returned HTTP 200 with no console errors, `lang=en`, one `h1`, a main landmark, and no missing image alt text. The Playwright axe integration reported no serious or critical violations on `/`, `/demo/`, `/privacy/`, `/terms/`, mapping, or inspection. `npx @axe-core/cli` was attempted but its Selenium launcher could not locate a Chrome binary in this container; the project’s pinned Playwright Chromium axe tests are the recorded accessibility evidence.
-
-Build output remains within static budgets: main JS 31.67 KB raw / 11.22 KB gzip; main CSS 17.98 KB raw / 4.88 KB gzip; mobile hero 53.7 KB; social card 86.6 KB. `dist/staticwebapp.config.json` supplies immutable caching for `/assets/*`, a manifest MIME type, CSP, frame policy, permissions policy, and the production 404 override.
-
-## Run and deploy
-
-Use `npm run dev` for local work. Deploy the generated `dist/` directory as the static app; it contains `index.html` at its root and `staticwebapp.config.json`. The repository’s configured `main` push is the handoff point for the factory static deployment; no DNS, billing, or other infrastructure was changed.
-
-Repair commit `a4c8103` was pushed to `origin/main`. At the post-push live-identity check (2026-08-28 10:34 UTC), `https://csv-import-cleanroom.sociobot.in/` still returned the prior page and a 09:08 UTC `Last-Modified` value. The repository has no GitHub Actions deployment workflow and no static-host deployment target/configuration was present in the worktree, so this container cannot activate the factory-owned live deployment. The pushed commit and `dist/staticwebapp.config.json` are ready for that deployment step.
-
-## Known limits
-
-- CSV only; the explicit local cap remains 10 MB and 50,000 data rows per file.
-- The local Vite preview does not apply Azure Static Web Apps response overrides, so the automated route test validates `staticwebapp.config.json` plus the rendered `404.html`; the production static host applies the 404 status/header policy.
-- The product intentionally has no cloud sync. Recipe JSON export/import remains the portability path.
+Run each command in `.factory/claims.json` individually before broader QA. Deployment should remain blocked until all release blockers above are repaired and independently reverified.
