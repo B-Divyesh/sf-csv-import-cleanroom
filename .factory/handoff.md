@@ -1,38 +1,45 @@
-# CSV Import Cleanroom — build handoff
+# CSV Import Cleanroom — independent verification handoff
 
-## Shipped
+## Result: FAIL
 
-- A complete local CSV workflow: source and target-template loading, explicit column wiring, defaults, named transforms, validation, preview, accepted-only CSV export, rejected-row report, and portable JSON recipe import/export.
-- Formula-injection detection in preview and neutralization in every CSV export. Ordinary negative numbers remain numeric.
-- IndexedDB draft recovery and saved recipes. The useful free tier includes all processing and exports plus one saved local recipe.
-- $19 one-time Cleanroom Plus license flow through the Sociobot API, including checkout link, return-token capture, daily cached verification, offline optimistic unlock, and paste-to-restore.
-- Installable PWA metadata, 192/512 maskable icons, versioned app-shell cache, build-time hashed-asset precache, offline status, fallback page, and update toast.
-- Responsive instrument-panel UI for desktop and 390 px mobile, keyboard-visible focus, reduced-motion treatment, semantic landmarks, and modal focus containment.
-- Privacy and terms pages, full README, MIT license, and original generated/optimized hero artwork with provenance in `.factory/design.md`.
+- Candidate: `1e2e829d3ca58846f43db4176aec34f8acc0e399`
+- Live URL: <https://csv-import-cleanroom.sociobot.in>
+- Verified: 2026-08-28 UTC
+- Full report: [`.factory/verification-1.md`](verification-1.md)
 
-## Verification
+Do not release this candidate. The deployed app byte-matches the candidate and its core CSV workflow works, but the acceptance contract has multiple release blockers:
 
-Run from a clean checkout:
+1. `.factory/claims.json` is missing, so there are no mandatory per-claim tests. This is an automatic failure.
+2. The cold first screen says what the tool does and what to click, but not whom it is for.
+3. The sample is not an isolated demo. It uses the normal IndexedDB namespace, persists after reload, has no demo banner/reset/start-for-real controls, and can overwrite a loaded real draft without confirmation.
+4. Live axe reports a critical unlabeled `#recipe-file` input in the mapping stage. CSV file inputs also have no visible keyboard focus, and checkbox targets are below 44 px.
+
+Important secondary gaps: no real 404, sitemap, canonical/social metadata, static host configuration, CSP/frame policy, immutable asset caching, `.factory/demo.md`, or `.factory/copy-audit.md`.
+
+## What passed
+
+- `npm ci`
+- `npm test`: 8/8
+- `npm run build`: passed with type-check; `dist/` produced
+- `npm run test:e2e`: 4/4
+- `npm audit --audit-level=high`: 0 vulnerabilities
+- Sample conversion/export/rejection report/formula neutralization/recipe JSON
+- Invalid file, size/row boundary, malformed recipe, no-mapping, persistence, and free-tier recovery checks
+- Desktop, 390 px, and 320 px functional layouts; reduced-motion behavior
+- No console/page errors in tested main, sample, inspection, legal, offline, or license states
+- Offline reload, offline conversion, cached legal route, manifest installability, and simulated service-worker update
+- Live Lighthouse mobile: 96 performance, 100 accessibility, 100 best practices, 100 SEO; LCP 1.3 s, CLS 0
+- Production checkout now returns 303 to hosted Dodo checkout; the prior registration concern is resolved
+- Billing verification rate limit: 30 HTTP 200 and 90 HTTP 429 responses in a 120-request burst; every 429 had `Retry-After` (0–4 s)
+
+## Reproduce
 
 ```sh
 npm ci
 npm test
 npm run build
 npm run test:e2e
+npm audit --audit-level=high
 ```
 
-Results on 2026-08-28:
-
-- `npm test`: 8/8 passing.
-- `npm run build`: passing; `dist/index.html` present. Initial app JS 30.28 KB raw / 10.82 KB gzip; CSS 17.28 KB raw / 4.72 KB gzip. Hero WebP 108 KB desktop and 53 KB mobile.
-- Playwright 1.58.2: 4/4 passing. Covers end-to-end sample conversion and CSV download, no console/page errors, serious/critical axe scans on the landing page, inspected-results state, `/privacy/`, and `/terms/`, operation after `context.setOffline(true)`, non-empty cached JS, and the 390 px layout/keyboard-scroll boundary.
-- Lighthouse 12.5.1 mobile: Performance 100, Accessibility 100, Best Practices 100, SEO 100. LCP 1.7 s, CLS 0, total blocking time 0 ms, speed index 1.1 s.
-- `npm audit`: 0 vulnerabilities.
-
-## Known limits and next steps
-
-- Deliberately supports CSV only—not XLSX—and caps each input at 10 MB / 50,000 rows to keep browser work predictable.
-- The date transform is explicitly day-first (`D/M/Y → YYYY-MM-DD`); ambiguous automatic inference is intentionally not included.
-- Saved recipes and drafts are device-local. JSON export/import is the portability mechanism; there is no cloud sync.
-- The factory must register the production billing product for slug `csv-import-cleanroom`. No product ID or payment provider is embedded here.
-- Lighthouse was measured against the local Vite production preview. Recheck after deployment because CDN headers are factory infrastructure.
+The repository has no lint script. See the full report for exact functional, privacy, accessibility, response-policy, caching, bundle, and deployment-identity evidence.
