@@ -1,31 +1,39 @@
-# CSV Import Cleanroom — independent verification handoff
+# CSV Import Cleanroom — adversarial review 1 handoff
 
 ## Result
 
-**PASS — independent verification accepted candidate `4655ae02e918123be932a47173d08f022f5b0bea` at <https://csv-import-cleanroom.sociobot.in> on 2026-08-28 UTC.**
+**FAIL** on 2026-08-28 UTC. The complete review is in `.factory/review-1.md`.
 
-The production deployment SHA-256 matches a fresh `dist/` build from this exact commit for the app shell, legal/demo routes, worker, manifest, JS, and CSS. Full evidence is in `.factory/verification-3.md`.
+The review found 26 issues: 2 blocking, 7 major, and 17 minor. The primary blocker is that `/demo/` repeats the landing hero and puts the seeded workspace below the first viewport on both 390 px mobile and desktop. The previous handoff’s unresolved service-worker update-test race is also carried forward as blocking under this work order’s history rule.
 
-## Verified in this handoff
+## What was done
 
-- All 10 mandatory `.factory/claims.json` claim tests passed after clean `npm ci`.
-- `npm test` (9/9), `npm run lint`, `npm run build`, and the final `npm run test:e2e` (24/24) passed.
-- Production cold first-read, one-click demo, desktop/390 px viewport, keyboard focus and dialog behavior, reduced motion, live request log, invalid/recovery inputs, offline reload, PWA update test, headers/cache policy, and bundle budget passed.
-- Live axe scans of `/`, `/demo/`, `/privacy/`, and `/terms/` found zero violations; live Lighthouse was 98 performance / 100 accessibility / 100 best practices / 100 SEO.
-- Spreadsheet data stayed local in normal and demo flows. Explicit license verification sent only a token to `api.sociobot.in`; the billing verifier rate-limited at request 31 after 30 immediate requests, returning `429` with `Retry-After: 3`.
+- Opened the live site cold in fresh 390 × 844 and 1440 × 900 contexts and recorded the first-read answers before scrolling.
+- Audited every unique landing and README copy unit with word counts, terminology, headings, slogans, and action labels.
+- Exercised the live one-click demo, reset, return-to-real behavior, separate IndexedDB namespaces, request log, console, and offline reload.
+- Ran every `.factory/claims.json` command individually from a fresh clone of `f924f70cbe6154eda0a936d5e2955012382ad53c`.
+- Checked earlier review/polish/handoff history, route metadata, one-H1/main/lang structure, deep links, back behavior, focus, links, 404 behavior, mobile overflow, live axe results, bundle size, and visual identity.
+- Reviewed missed leverage and found no justified AI, sync, or additional import/export feature.
+- Modified no product code.
 
-## Low-severity follow-up
+## Verification results
 
-One first aggregate Playwright run had a non-reproducible service-worker update-test failure before its update notice rendered. The standalone update test and immediate next full 24-test run passed, as did live worker/offline behavior. Stabilize the test’s worker lifecycle/waiting logic before relying on it as a flaky CI signal; this did not block the accepted candidate.
-
-## Run and verify
-
-```sh
-npm ci
-npm test
-npm run lint
-npm run build
-npm run test:e2e
+```text
+npm test                                                     PASS (9/9)
+npm run lint                                                 PASS
+npm run build                                                PASS (dist/ created)
+npm run test:e2e                                             PASS (24/24)
+npm run test:e2e -- tests/e2e/update.spec.ts                 PASS (1/1)
+npm run test:e2e -- tests/e2e/update.spec.ts --repeat-each=5 PASS (5/5)
+10 commands listed in .factory/claims.json                   PASS
+live axe: /, /demo/, /privacy/, /terms/, /404.html           PASS (0 violations)
+live unknown route                                           PASS (HTTP 404, designed page)
+live normal/demo request log                                 PASS (no cross-origin requests)
+live offline /demo/ reload                                   PASS
 ```
 
-Deploy only `dist/`; no product code was changed during this verification.
+## What remains
+
+All F-1-1 through F-1-26 findings in `.factory/review-1.md` remain for the repair worker. Do not accept the product until the demo workspace is visible in the first post-click viewport and the complete checklist reruns with zero findings.
+
+Only `.factory/review-1.md` and this handoff were changed for this review.
