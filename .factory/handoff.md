@@ -24,7 +24,9 @@ Repair commit `3f07771462fac63bd95454daf00980790b8df266` closes every F-1 and F-
 
 ## Deployment and live follow-up
 
-`swa deploy dist --env production --app-name csv-import-cleanroom --resource-group ParamFactory --no-use-keychain` authenticated but the factory Azure client lacks `Microsoft.Web/staticSites/read` for that resource group. The live root still served its previous `main-BDTrKIc8.js` at the time of check, so live deployment and cold recheck are pending the factory deployment authority. No product defect remains in the committed static artifact.
+The generic Azure CLI route was denied by RBAC, so deployment used the configured factory static work order: `/opt/fleet/lib/deploy-static.sh csv-import-cleanroom /work/repo/dist`. Azure Static Web Apps production deployment `cfea12e9-0ab8-4b1d-8438-8ea02ba15e50` succeeded and bound the ready custom domain.
+
+Cold production recheck at <https://csv-import-cleanroom.sociobot.in> and `/demo/` passed. All four routes (`/`, `/demo/`, `/privacy/`, `/terms/`) have one H1, one main landmark, expected title, and no serious/critical Axe violations. The settled 390 × 844 demo focused `#workspace-title` while its banner stayed at y=72–188; all three required controls were inside the viewport. Home → Privacy → Back restored the Home URL, title, `#page-title` focus, and “Home page loaded.” announcement. No console errors occurred. Screenshots: `.factory/qa-evidence/polish-2-live-demo-mobile.png` and `.factory/qa-evidence/polish-2-live-home-mobile.png`.
 
 ## Run locally
 

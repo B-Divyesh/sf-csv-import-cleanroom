@@ -4,9 +4,9 @@ Repair commit: `3f07771462fac63bd95454daf00980790b8df266`. Evidence is captured 
 
 | Finding | Change made | Evidence |
 | --- | --- | --- |
-| F-1-1 / F-2-1 | The demo keeps its exact isolation message, Reset demo, and Start for real controls in a sticky compact status bar while the seeded workspace is focused. | `keeps the demo identity and controls in the settled mobile workspace viewport`; mobile screenshot/live check pending deployment. |
+| F-1-1 / F-2-1 | The demo keeps its exact isolation message, Reset demo, and Start for real controls in a sticky compact status bar while the seeded workspace is focused. | `keeps the demo identity and controls in the settled mobile workspace viewport`; [live 390 px screenshot](qa-evidence/polish-2-live-demo-mobile.png); <https://csv-import-cleanroom.sociobot.in/demo/>. |
 | F-1-2 | The update test waits for a waiting worker, confirms the replacement controller and cache, then cold-reloads its shell; its worker fixture remains isolated. | `activates a waiting service-worker update from the in-app notice --repeat-each=5`. |
-| F-1-3 / F-2-2 | Removed mixed `pushState` plus `location.replace` handling. Real routes now use ordinary same-origin document navigation; home headings are focusable and route announcements remain available. | `restores the Home document, title, focus, and announcement with browser Back`. |
+| F-1-3 / F-2-2 | Removed mixed `pushState` plus `location.replace` handling. Real routes now use ordinary same-origin document navigation; home headings are focusable and route announcements remain available. | `restores the Home document, title, focus, and announcement with browser Back`; cold live Home → Privacy → Back check at <https://csv-import-cleanroom.sociobot.in/>. |
 | F-1-4 | Stage changes focus the workspace heading after render. | `opens the mapped demo workspace in the first viewport and keeps stage focus`. |
 | F-1-5 | Legal and 404 pages retain the shared header, legal footer, factory credit, and build id. | `serves product routes, metadata, sitemap, and a real 404`. |
 | F-1-6 | Landing includes dedicated privacy/limits and visible Free/Plus sections. | `serves product routes…`; landing cold check. |
@@ -31,6 +31,6 @@ Repair commit: `3f07771462fac63bd95454daf00980790b8df266`. Evidence is captured 
 | F-1-25 | README verification description is short and specific. | `.factory/copy-audit.md`. |
 | F-1-26 | README explains the claim registry in plain words. | `.factory/copy-audit.md`. |
 | F-2-3 | Registered `free-tier-entitlements`; it proves a free rejection report, one free saved recipe, and the second-save Plus gate. | `@claim:free-tier-entitlements`. |
-| F-2-4 | Demo Saved recipes is now an H2 beneath the demo H1, with an explicit Axe heading-order assertion. | `has no serious or critical accessibility violations in every workflow state`. |
+| F-2-4 | Demo Saved recipes is now an H2 beneath the demo H1, with an explicit Axe heading-order assertion. | `has no serious or critical accessibility violations in every workflow state`; live Axe scan of <https://csv-import-cleanroom.sociobot.in/demo/> returned no violations. |
 
 The visual system is unchanged: the warm calibration bench, paper/enamel palette, engraved stage plates, and local-first work surface remain product-specific.
