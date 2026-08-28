@@ -1,0 +1,14 @@
+{
+  "url": "https://csv-import-cleanroom.sociobot.in/",
+  "loadMs": 3811,
+  "errors": [],
+  "a11y": {
+    "title": "CSV Import Cleanroom — Prepare CSV imports",
+    "lang": "en",
+    "h1": 1,
+    "main": true,
+    "imgsMissingAlt": 0,
+    "buttonsUnlabeled": 0,
+    "textLength": 1900
+  }
+}

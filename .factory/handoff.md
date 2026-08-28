@@ -30,4 +30,4 @@ Evidence screenshots are under `.factory/qa-evidence/polish-1-*`. Main bundle is
 
 ## Deployment
 
-Pushed the repair series to `origin/main`. At the time of this handoff update, production still served the prior title while deployment propagation was in progress. Recheck <https://csv-import-cleanroom.sociobot.in> cold for the new title and `/demo/` mapping-first view before release.
+Pushed the repair series to `origin/main`, then deployed `dist/` directly through the configured Azure Static Web Apps production channel. A cold live recheck passed at <https://csv-import-cleanroom.sociobot.in> and `/demo/`: root title is “CSV Import Cleanroom — Prepare CSV imports”; `verify-url.sh` found no console errors, one H1, `lang=en`, main, and complete image alt text on both routes. The live 390 × 844 demo exposes the mapping table at y=484.8, inside its first viewport. Live evidence is in `.factory/qa-evidence/polish-1-live-*`.
